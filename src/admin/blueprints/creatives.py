@@ -8,11 +8,11 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from typing import Any
 
-from src.core.database.models import (
+from core.database.models import (
     ObjectWorkflowMapping,
     WorkflowStep,
 )
-from src.core.database.models import (
+from core.database.models import (
     PushNotificationConfig as DBPushNotificationConfig,
 )
 from a2a.types import Task, TaskStatusUpdateEvent
@@ -20,7 +20,7 @@ from adcp import create_a2a_webhook_payload, create_mcp_webhook_payload
 from adcp.types import McpWebhookPayload, SyncCreativesSuccessResponse, CreativeAction, SyncCreativeResult
 from adcp.types.generated_poc.core.context import ContextObject
 from adcp.webhooks import GeneratedTaskStatus
-from src.services.protocol_webhook_service import get_protocol_webhook_service
+from services.protocol_webhook_service import get_protocol_webhook_service
 
 # TODO: Missing module - these functions need to be implemented
 # from creative_formats import discover_creative_formats_from_url, parse_creative_spec
@@ -40,10 +40,10 @@ def discover_creative_formats_from_url(url):
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 from sqlalchemy import select
 
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import Tenant
 
 # Note: CreativeFormat table was dropped in migration f2addf453200
 # All format-related routes have been removed
@@ -112,7 +112,7 @@ async def _call_webhook_for_creative_status(
     Returns:
         bool: True if webhook delivered successfully, False otherwise (or if no config found)
     """
-    from src.core.schemas import CreativeStatusEnum
+    from core.schemas import CreativeStatusEnum
 
     try:
         stmt = (
@@ -142,7 +142,7 @@ async def _call_webhook_for_creative_status(
             return False
 
         # Get creative statuses for all creatives in this task
-        from src.core.database.models import Creative
+        from core.database.models import Creative
 
         creative_ids = [m.object_id for m in all_mappings]
         stmt_creatives = select(Creative).filter(Creative.creative_id.in_(creative_ids))
@@ -284,7 +284,7 @@ def index(tenant_id, **kwargs):
 @require_tenant_access()
 def review_creatives(tenant_id, **kwargs):
     """Unified creative management: view, review, and manage all creatives."""
-    from src.core.database.models import Creative, CreativeAssignment, MediaBuy, Principal, Product
+    from core.database.models import Creative, CreativeAssignment, MediaBuy, Principal, Product
 
     with get_db_session() as db_session:
         # Get tenant
@@ -412,8 +412,8 @@ def analyze(tenant_id, **kwargs):
 @require_tenant_access()
 def approve_creative(tenant_id, creative_id, **kwargs):
     """Approve a creative."""
-    from src.core.audit_logger import AuditLogger
-    from src.core.database.models import Creative, CreativeReview
+    from core.audit_logger import AuditLogger
+    from core.database.models import Creative, CreativeReview
 
     try:
         data = request.get_json() or {}
@@ -479,13 +479,13 @@ def approve_creative(tenant_id, creative_id, **kwargs):
             stmt_tenant = select(Tenant).filter_by(tenant_id=tenant_id)
             tenant = db_session.scalars(stmt_tenant).first()
             if tenant and tenant.slack_webhook_url:
-                from src.services.slack_notifier import get_slack_notifier
+                from services.slack_notifier import get_slack_notifier
 
                 tenant_config = {"features": {"slack_webhook_url": tenant.slack_webhook_url}}
                 notifier = get_slack_notifier(tenant_config)
 
                 # Get principal name
-                from src.core.database.models import Principal
+                from core.database.models import Principal
 
                 stmt_principal = select(Principal).filter_by(tenant_id=tenant_id, principal_id=creative.principal_id)
                 principal = db_session.scalars(stmt_principal).first()
@@ -516,7 +516,7 @@ def approve_creative(tenant_id, creative_id, **kwargs):
             # Check if this creative approval unblocks any media buys
             # If a media buy was waiting for creatives (status="pending_creatives"),
             # check if all its creatives are now approved
-            from src.core.database.models import CreativeAssignment, MediaBuy
+            from core.database.models import CreativeAssignment, MediaBuy
 
             stmt_assignments = select(CreativeAssignment).filter_by(tenant_id=tenant_id, creative_id=creative_id)
             assignments = db_session.scalars(stmt_assignments).all()
@@ -563,7 +563,7 @@ def approve_creative(tenant_id, creative_id, **kwargs):
                             f"[CREATIVE APPROVAL] All creatives approved for media buy {media_buy_id}, executing adapter creation"
                         )
 
-                        from src.core.tools.media_buy_create import execute_approved_media_buy
+                        from core.tools.media_buy_create import execute_approved_media_buy
 
                         success, error_msg = execute_approved_media_buy(media_buy_id, tenant_id)
 
@@ -596,8 +596,8 @@ def approve_creative(tenant_id, creative_id, **kwargs):
 @require_tenant_access()
 def reject_creative(tenant_id, creative_id, **kwargs):
     """Reject a creative with comments."""
-    from src.core.audit_logger import AuditLogger
-    from src.core.database.models import Creative, CreativeReview
+    from core.audit_logger import AuditLogger
+    from core.database.models import Creative, CreativeReview
 
     try:
         data = request.get_json() or {}
@@ -676,13 +676,13 @@ def reject_creative(tenant_id, creative_id, **kwargs):
             stmt_tenant = select(Tenant).filter_by(tenant_id=tenant_id)
             tenant = db_session.scalars(stmt_tenant).first()
             if tenant and tenant.slack_webhook_url:
-                from src.services.slack_notifier import get_slack_notifier
+                from services.slack_notifier import get_slack_notifier
 
                 tenant_config = {"features": {"slack_webhook_url": tenant.slack_webhook_url}}
                 notifier = get_slack_notifier(tenant_config)
 
                 # Get principal name
-                from src.core.database.models import Principal
+                from core.database.models import Principal
 
                 stmt_principal = select(Principal).filter_by(tenant_id=tenant_id, principal_id=creative.principal_id)
                 principal = db_session.scalars(stmt_principal).first()
@@ -754,7 +754,7 @@ async def _ai_review_creative_async(
             logger.info(f"[AI Review Async] Review completed for {creative_id}: {ai_result['status']}")
 
             # Update creative status in database
-            from src.core.database.models import Creative
+            from core.database.models import Creative
 
             stmt = select(Creative).filter_by(tenant_id=tenant_id, creative_id=creative_id)
             creative = session.scalars(stmt).first()
@@ -784,7 +784,7 @@ async def _ai_review_creative_async(
                 # Send Slack notification with AI review results if configured
                 if slack_webhook_url and principal_name:
                     try:
-                        from src.services.slack_notifier import get_slack_notifier
+                        from services.slack_notifier import get_slack_notifier
 
                         tenant_config = {"features": {"slack_webhook_url": slack_webhook_url}}
                         notifier = get_slack_notifier(tenant_config)
@@ -840,7 +840,7 @@ async def _ai_review_creative_async(
         # Try to mark creative as pending with error
         try:
             with get_db_session() as session:
-                from src.core.database.models import Creative
+                from core.database.models import Creative
 
                 stmt = select(Creative).filter_by(tenant_id=tenant_id, creative_id=creative_id)
                 creative = session.scalars(stmt).first()
@@ -906,7 +906,7 @@ def _create_review_record(db_session, creative_id: str, tenant_id: str, ai_resul
             - policy_triggered: Policy that was triggered
             - ai_recommendation: Optional AI recommendation if different from final
     """
-    from src.core.database.models import CreativeReview
+    from core.database.models import CreativeReview
 
     try:
         review_id = f"review_{uuid.uuid4().hex[:12]}"
@@ -951,16 +951,16 @@ def _ai_review_creative_impl(tenant_id, creative_id, db_session=None, promoted_o
 
     from sqlalchemy import select
 
-    from src.core.database.models import Creative
-    from src.core.metrics import (
+    from core.database.models import Creative
+    from core.metrics import (
         active_ai_reviews,
         ai_review_confidence,
         ai_review_duration,
         ai_review_errors,
         ai_review_total,
     )
-    from src.services.ai import AIServiceFactory
-    from src.services.ai.agents.review_agent import (
+    from services.ai import AIServiceFactory
+    from services.ai.agents.review_agent import (
         create_review_agent,
         parse_confidence_score,
         review_creative_async,
@@ -1019,7 +1019,7 @@ def _ai_review_creative_impl(tenant_id, creative_id, db_session=None, promoted_o
             if promoted_offering is None:
                 promoted_offering = "Unknown"
                 if creative.data.get("media_buy_id"):
-                    from src.core.database.models import MediaBuy, Product
+                    from core.database.models import MediaBuy, Product
 
                     stmt = select(MediaBuy).filter_by(media_buy_id=creative.data["media_buy_id"])
                     media_buy = db_session.scalars(stmt).first()

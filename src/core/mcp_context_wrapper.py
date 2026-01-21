@@ -26,10 +26,10 @@ from fastmcp.server import Context as FastMCPContext
 from pydantic import BaseModel
 from rich.console import Console
 
-from src.core.config_loader import set_current_tenant
-from src.core.context_manager import get_context_manager
-from src.core.testing_hooks import get_testing_context
-from src.core.tool_context import ToolContext
+from core.config_loader import set_current_tenant
+from core.context_manager import get_context_manager
+from core.testing_hooks import get_testing_context
+from core.tool_context import ToolContext
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -192,7 +192,7 @@ class MCPContextWrapper:
             A populated ToolContext object
         """
         # Import here to avoid circular dependency
-        from src.core.main import get_principal_from_context as get_principal_with_tenant
+        from core.main import get_principal_from_context as get_principal_with_tenant
 
         # Get authentication info and tenant context (returns tuple)
         # This uses the main.py version which properly detects tenant from subdomain/virtual host

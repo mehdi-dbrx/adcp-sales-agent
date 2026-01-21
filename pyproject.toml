@@ -1,6 +1,6 @@
 [project]
 name = "adcp-sales-agent"
-version = "0.9.0"
+version = "0.9.20"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -47,6 +47,7 @@ dependencies = [
     "filelock>=3.20.3",  # GHSA-qmgc-5h2g-mvrw
     "urllib3>=2.6.3",  # GHSA-38jv-5279-wg99
     "werkzeug>=3.1.5",  # GHSA-87hc-h4r5-73f7
+    "databricks-sdk>=0.30.0",  # For Lakebase token refresh (generating database credential tokens)
 ]
 
 

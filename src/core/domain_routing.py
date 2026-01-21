@@ -14,11 +14,11 @@ from typing import Literal
 
 # Import existing tenant lookup functions from config_loader
 # This ensures all servers (MCP, Admin, A2A) use the same lookup logic
-from src.core.config_loader import (
+from core.config_loader import (
     get_tenant_by_subdomain,
     get_tenant_by_virtual_host,
 )
-from src.core.domain_config import (
+from core.domain_config import (
     extract_subdomain_from_host,
     is_admin_domain,
     is_sales_agent_domain,

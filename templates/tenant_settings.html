@@ -62,6 +62,13 @@
     .settings-nav-icon {
         width: 20px;
         text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .settings-nav-icon i {
+        font-size: 1rem;
     }
 
     .settings-nav-separator {
@@ -94,8 +101,11 @@
     .settings-header h2 {
         margin: 0 0 0.5rem 0;
         font-size: 1.5rem;
-        font-weight: 700;
+        font-weight: 600;
         color: #111827;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
     }
 
     .settings-header p {
@@ -396,7 +406,9 @@
 
     .stat-value {
         font-size: 2rem;
-        font-weight: 700;
+        font-weight: 600;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif;
+        letter-spacing: -0.02em;
         color: #111827;
         margin-bottom: 0.25rem;
     }
@@ -431,7 +443,7 @@
 <!-- Header -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <h1 style="margin: 0; font-size: 1.875rem; font-weight: 700; color: #111827;">Settings</h1>
+        <h1 style="margin: 0; font-size: 1.875rem; font-weight: 600; color: #111827; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif; letter-spacing: -0.03em; line-height: 1.2;">Settings</h1>
         <p style="margin: 0.25rem 0 0 0; color: #6b7280; font-size: 0.875rem;">
             Configure {{ tenant.name }}
         </p>
@@ -445,58 +457,58 @@
     <!-- Settings Navigation -->
     <nav class="settings-nav">
         <a class="settings-nav-item active" data-section="account">
-            <span class="settings-nav-icon">🏢</span>
+            <span class="settings-nav-icon"><i class="fas fa-building"></i></span>
             <span>Account</span>
         </a>
 
         <a class="settings-nav-item" href="{{ url_for('tenants.setup_checklist', tenant_id=tenant.tenant_id) }}">
-            <span class="settings-nav-icon">✅</span>
+            <span class="settings-nav-icon"><i class="fas fa-check-circle"></i></span>
             <span>Setup Checklist</span>
         </a>
 
         <a class="settings-nav-item" href="{{ url_for('users.list_users', tenant_id=tenant.tenant_id) }}">
-            <span class="settings-nav-icon">👥</span>
+            <span class="settings-nav-icon"><i class="fas fa-users"></i></span>
             <span>Users & Access</span>
         </a>
 
         <div class="settings-nav-separator"></div>
 
         <a class="settings-nav-item" data-section="adserver">
-            <span class="settings-nav-icon">🖥️</span>
+            <span class="settings-nav-icon"><i class="fas fa-server"></i></span>
             <span>Ad Server</span>
         </a>
 
         <a class="settings-nav-item" data-section="business-rules">
-            <span class="settings-nav-icon">📋</span>
+            <span class="settings-nav-icon"><i class="fas fa-clipboard-list"></i></span>
             <span>Policies & Workflows</span>
         </a>
 
         <a class="settings-nav-item" data-section="integrations">
-            <span class="settings-nav-icon">🔗</span>
+            <span class="settings-nav-icon"><i class="fas fa-plug"></i></span>
             <span>Integrations</span>
         </a>
 
         <div class="settings-nav-separator"></div>
 
         <a class="settings-nav-item" data-section="publishers">
-            <span class="settings-nav-icon">🌐</span>
+            <span class="settings-nav-icon"><i class="fas fa-globe"></i></span>
             <span>Publishers</span>
         </a>
 
         <a class="settings-nav-item" data-section="products">
-            <span class="settings-nav-icon">📦</span>
+            <span class="settings-nav-icon"><i class="fas fa-box"></i></span>
             <span>Products</span>
         </a>
 
         <a class="settings-nav-item" data-section="inventory">
-            <span class="settings-nav-icon">📊</span>
+            <span class="settings-nav-icon"><i class="fas fa-chart-bar"></i></span>
             <span>Inventory</span>
         </a>
 
         <div class="settings-nav-separator"></div>
 
         <a class="settings-nav-item" data-section="advertisers">
-            <span class="settings-nav-icon">👥</span>
+            <span class="settings-nav-icon"><i class="fas fa-handshake"></i></span>
             <span>Advertisers</span>
         </a>
 
@@ -504,7 +516,7 @@
         <div class="settings-nav-separator"></div>
 
         <a class="settings-nav-item" data-section="danger-zone">
-            <span class="settings-nav-icon">⚠️</span>
+            <span class="settings-nav-icon"><i class="fas fa-exclamation-triangle"></i></span>
             <span>Danger Zone</span>
         </a>
         {% endif %}

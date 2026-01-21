@@ -40,7 +40,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from src.core.schemas import AdCPBaseModel
+from core.schemas import AdCPBaseModel
 
 # Task status values per AdCP spec
 TaskStatus = Literal[

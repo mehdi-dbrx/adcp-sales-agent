@@ -61,21 +61,21 @@ def validate_agent_url(url: str | None) -> bool:
 
 
 # Tool-specific imports
-from src.core import schemas
-from src.core.audit_logger import get_audit_logger
-from src.core.auth import (
+from core import schemas
+from core.audit_logger import get_audit_logger
+from core.auth import (
     get_principal_object,
 )
-from src.core.config_loader import get_current_tenant
-from src.core.context_manager import get_context_manager
-from src.core.database.models import MediaBuy
-from src.core.database.models import Principal as ModelPrincipal
-from src.core.database.models import Product as ModelProduct
-from src.core.helpers import get_principal_id_from_context, log_tool_activity
-from src.core.helpers.adapter_helpers import get_adapter
-from src.core.helpers.creative_helpers import _convert_creative_to_adapter_asset, process_and_upload_package_creatives
-from src.core.schema_helpers import to_context_object, to_reporting_webhook
-from src.core.schemas import (
+from core.config_loader import get_current_tenant
+from core.context_manager import get_context_manager
+from core.database.models import MediaBuy
+from core.database.models import Principal as ModelPrincipal
+from core.database.models import Product as ModelProduct
+from core.helpers import get_principal_id_from_context, log_tool_activity
+from core.helpers.adapter_helpers import get_adapter
+from core.helpers.creative_helpers import _convert_creative_to_adapter_asset, process_and_upload_package_creatives
+from core.schema_helpers import to_context_object, to_reporting_webhook
+from core.schemas import (
     CreateMediaBuyError,
     CreateMediaBuyRequest,
     CreateMediaBuySuccess,
@@ -88,15 +88,15 @@ from src.core.schemas import (
     Principal,
     Product,
 )
-from src.core.schemas import (
+from core.schemas import (
     url as make_url,
 )
-from src.core.testing_hooks import TestingContext, apply_testing_hooks, get_testing_context
-from src.core.tool_context import ToolContext
+from core.testing_hooks import TestingContext, apply_testing_hooks, get_testing_context
+from core.tool_context import ToolContext
 
 # Import get_product_catalog from main (after refactor)
-from src.core.validation_helpers import format_validation_error
-from src.services.activity_feed import activity_feed
+from core.validation_helpers import format_validation_error
+from services.activity_feed import activity_feed
 
 # --- Helper Functions ---
 
@@ -300,7 +300,7 @@ def _get_format_spec_sync(agent_url: str, format_id: str) -> Any | None:
     """
     import asyncio
 
-    from src.core.creative_agent_registry import get_creative_agent_registry
+    from core.creative_agent_registry import get_creative_agent_registry
 
     registry = get_creative_agent_registry()
 
@@ -328,8 +328,8 @@ def _validate_creatives_before_adapter_call(packages: list[Package], tenant_id: 
     """
     from sqlalchemy import select
 
-    from src.core.database.database_session import get_db_session
-    from src.core.database.models import Creative as DBCreative
+    from core.database.database_session import get_db_session
+    from core.database.models import Creative as DBCreative
 
     # Collect all creative IDs from all packages
     all_creative_ids = set()
@@ -488,15 +488,15 @@ def execute_approved_media_buy(media_buy_id: str, tenant_id: str) -> tuple[bool,
     """
     from sqlalchemy import select
 
-    from src.core.database.database_session import get_db_session
-    from src.core.database.models import MediaBuy
-    from src.core.database.models import MediaPackage as DBMediaPackage
+    from core.database.database_session import get_db_session
+    from core.database.models import MediaBuy
+    from core.database.models import MediaPackage as DBMediaPackage
 
     logger.info(f"[APPROVAL] Executing adapter creation for approved media buy {media_buy_id}")
 
     # Set tenant context (required for adapter helpers to work)
-    from src.core.config_loader import set_current_tenant
-    from src.core.database.models import Tenant
+    from core.config_loader import set_current_tenant
+    from core.database.models import Tenant
 
     try:
         # Load tenant and set context
@@ -559,7 +559,7 @@ def execute_approved_media_buy(media_buy_id: str, tenant_id: str) -> tuple[bool,
             # We need to load Products to get name, delivery_type, format_ids, etc.
             from sqlalchemy.orm import selectinload
 
-            from src.core.database.models import Product as ProductModel
+            from core.database.models import Product as ProductModel
 
             packages: list[MediaPackage] = []
             package_pricing_info: dict[str, dict[str, Any]] = {}
@@ -648,7 +648,7 @@ def execute_approved_media_buy(media_buy_id: str, tenant_id: str) -> tuple[bool,
                     # Get targeting_overlay from package_config if present
                     targeting_overlay = None
                     if "targeting_overlay" in package_config and package_config["targeting_overlay"]:
-                        from src.core.schemas import Targeting
+                        from core.schemas import Targeting
 
                         targeting_overlay = Targeting(**package_config["targeting_overlay"])
 
@@ -672,8 +672,8 @@ def execute_approved_media_buy(media_buy_id: str, tenant_id: str) -> tuple[bool,
                         delivery_type_str = "non_guaranteed"  # Default fallback
 
                     # Convert formats to FormatId objects with comprehensive validation
-                    from src.core.schemas import FormatId as FormatIdType
-                    from src.core.schemas import FormatReference
+                    from core.schemas import FormatId as FormatIdType
+                    from core.schemas import FormatReference
 
                     format_ids_list: list[FormatIdType] = []
                     formats = product.format_ids or []
@@ -779,7 +779,7 @@ def execute_approved_media_buy(media_buy_id: str, tenant_id: str) -> tuple[bool,
                 return False, error_msg
 
             # Get the Principal object (needed for adapter)
-            from src.core.auth import get_principal_object
+            from core.auth import get_principal_object
 
             principal = get_principal_object(media_buy.principal_id)
             if not principal:
@@ -824,11 +824,11 @@ def execute_approved_media_buy(media_buy_id: str, tenant_id: str) -> tuple[bool,
         # Upload and associate inline creatives if any exist
         # This handles inline creatives that were uploaded during initial media buy creation
         with get_db_session() as session:
-            from src.core.database.models import Creative as CreativeModel
-            from src.core.database.models import CreativeAssignment
+            from core.database.models import Creative as CreativeModel
+            from core.database.models import CreativeAssignment
 
             # Import adapter helper here (used for both creative upload and order approval)
-            from src.core.helpers.adapter_helpers import get_adapter
+            from core.helpers.adapter_helpers import get_adapter
 
             # Get all creative assignments for this media buy
             stmt_assignments = select(CreativeAssignment).filter_by(media_buy_id=media_buy_id)
@@ -873,7 +873,7 @@ def execute_approved_media_buy(media_buy_id: str, tenant_id: str) -> tuple[bool,
                     creative_data = creative.data or {}
 
                     # Get format spec for proper extraction
-                    from src.core.format_resolver import get_format
+                    from core.format_resolver import get_format
 
                     format_spec = None
                     try:
@@ -1176,7 +1176,7 @@ async def _validate_and_convert_format_ids(
     Raises:
         ToolError: If any format_id is invalid, unregistered, or doesn't exist
     """
-    from src.core.creative_agent_registry import CreativeAgentRegistry
+    from core.creative_agent_registry import CreativeAgentRegistry
 
     if not format_ids:
         return []
@@ -1188,7 +1188,7 @@ async def _validate_and_convert_format_ids(
     registered_agents = registry._get_tenant_agents(tenant_id)
     # Normalize agent URLs for consistent comparison (strips /mcp, /a2a, /.well-known/*, trailing slashes)
     # This ensures all URL variations match: "https://example.com/mcp/" -> "https://example.com"
-    from src.core.validation import normalize_agent_url
+    from core.validation import normalize_agent_url
 
     registered_agent_urls = {normalize_agent_url(agent.agent_url) for agent in registered_agents}
 
@@ -1261,8 +1261,8 @@ async def _validate_and_convert_format_ids(
     return validated_format_ids
 
 
-from src.services.setup_checklist_service import SetupIncompleteError, validate_setup_complete
-from src.services.slack_notifier import get_slack_notifier
+from services.setup_checklist_service import SetupIncompleteError, validate_setup_complete
+from services.slack_notifier import get_slack_notifier
 
 
 async def _create_media_buy_impl(
@@ -1425,8 +1425,8 @@ async def _create_media_buy_impl(
 
     # Register push notification config if provided (MCP/A2A protocol support)
     if push_notification_config:
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import PushNotificationConfig as DBPushNotificationConfig
+        from core.database.database_session import get_db_session
+        from core.database.models import PushNotificationConfig as DBPushNotificationConfig
 
         logger.info(f"[MCP/A2A] Registering push notification config from request: {push_notification_config}")
 
@@ -1573,9 +1573,9 @@ async def _create_media_buy_impl(
 
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import CurrencyLimit
-        from src.core.database.models import Product as ProductModel
+        from core.database.database_session import get_db_session
+        from core.database.models import CurrencyLimit
+        from core.database.models import Product as ProductModel
 
         # Get products first to determine currency from pricing options
         with get_db_session() as session:
@@ -1682,7 +1682,7 @@ async def _create_media_buy_impl(
 
             # Check if currency is supported by GAM network (if GAM is configured)
             # GAM only accepts: primary currency OR enabled secondary currencies
-            from src.core.database.models import AdapterConfig
+            from core.database.models import AdapterConfig
 
             adapter_config_stmt = select(AdapterConfig).where(AdapterConfig.tenant_id == tenant["tenant_id"])
             adapter_config = session.scalars(adapter_config_stmt).first()
@@ -1854,7 +1854,7 @@ async def _create_media_buy_impl(
         # Validate targeting doesn't use managed-only dimensions (targeting_overlay is at package level per AdCP spec)
         for pkg in req.packages:
             if hasattr(pkg, "targeting_overlay") and pkg.targeting_overlay:
-                from src.services.targeting_capabilities import validate_overlay_targeting
+                from services.targeting_capabilities import validate_overlay_targeting
 
                 # Convert to dict for validation - TargetingOverlay always has model_dump
                 targeting_data: dict[str, Any] = (
@@ -2016,7 +2016,7 @@ async def _create_media_buy_impl(
 
                 # Build Package object with complete package data (matching auto-approval path)
                 # NOTE: Package schema does NOT have a 'status' field - workflow state is tracked in WorkflowStep
-                from src.core.schemas import Package
+                from core.schemas import Package
 
                 # Create Package object from request package, adding generated fields
                 # Must map PackageRequest fields to Package fields:
@@ -2122,7 +2122,7 @@ async def _create_media_buy_impl(
             # Create MediaPackage records for structured querying
             # This enables the UI to display packages and creative assignments to work properly
             with get_db_session() as session:
-                from src.core.database.models import MediaPackage as DBMediaPackage
+                from core.database.models import MediaPackage as DBMediaPackage
 
                 for pkg_obj in pending_packages:
                     # Get paused state from package (adcp 2.12.0: replaced status enum with paused bool)
@@ -2225,7 +2225,7 @@ async def _create_media_buy_impl(
 
             # Link the workflow step to the media buy so the approval button shows in UI
             with get_db_session() as session:
-                from src.core.database.models import ObjectWorkflowMapping
+                from core.database.models import ObjectWorkflowMapping
 
                 mapping = ObjectWorkflowMapping(
                     object_type="media_buy", object_id=media_buy_id, step_id=step.step_id, action="create"
@@ -2238,8 +2238,8 @@ async def _create_media_buy_impl(
             # This must happen AFTER media packages are created so we have package_ids
             if req.packages:
                 with get_db_session() as session:
-                    from src.core.database.models import Creative as DBCreative
-                    from src.core.database.models import CreativeAssignment as DBAssignment
+                    from core.database.models import Creative as DBCreative
+                    from core.database.models import CreativeAssignment as DBAssignment
 
                     # Batch load all creatives upfront
                     all_creative_ids = []
@@ -2263,7 +2263,7 @@ async def _create_media_buy_impl(
                         # - Creatives may be synced before being assigned to products
                         # - A creative may be valid for product A but not product B
                         # - Same creative can be reused across packages if formats align
-                        from src.core.helpers import validate_creative_format_against_product
+                        from core.helpers import validate_creative_format_against_product
 
                         for package in req.packages:
                             if package.creative_ids and package.product_id:
@@ -2359,7 +2359,7 @@ async def _create_media_buy_impl(
 
         # Get products for the media buy to check product-level auto-creation settings
         # Lazy import to avoid circular dependency with main.py
-        from src.core.main import get_product_catalog
+        from core.main import get_product_catalog
 
         catalog = get_product_catalog()
         product_ids = req.get_product_ids()
@@ -2367,7 +2367,7 @@ async def _create_media_buy_impl(
 
         # Validate and auto-generate GAM implementation_config for each product if needed
         if adapter.__class__.__name__ == "GoogleAdManager":
-            from src.services.gam_product_config_service import GAMProductConfigService
+            from services.gam_product_config_service import GAMProductConfigService
 
             gam_validator = GAMProductConfigService()
             config_errors = []
@@ -2785,7 +2785,7 @@ async def _create_media_buy_impl(
 
         # Store the media buy in memory (for backward compatibility)
         # Lazy import to avoid circular dependency
-        from src.core.main import media_buys
+        from core.main import media_buys
 
         media_buys[response.media_buy_id] = (req, principal_id)
 
@@ -2847,7 +2847,7 @@ async def _create_media_buy_impl(
         # This enables creative_assignments to work properly
         if req.packages or (response.packages and len(response.packages) > 0):
             with get_db_session() as session:
-                from src.core.database.models import MediaPackage as DBMediaPackage
+                from core.database.models import MediaPackage as DBMediaPackage
 
                 # Use response packages if available (has package_ids), otherwise generate from request
                 packages_to_save = response.packages if response.packages else []
@@ -2951,7 +2951,7 @@ async def _create_media_buy_impl(
                         # Update the package_config with platform_line_item_id
                         from sqlalchemy import select
 
-                        from src.core.database.models import MediaPackage as DBMediaPackage
+                        from core.database.models import MediaPackage as DBMediaPackage
 
                         package_stmt = select(DBMediaPackage).filter_by(
                             media_buy_id=response.media_buy_id, package_id=pkg_id
@@ -2975,8 +2975,8 @@ async def _create_media_buy_impl(
         # Handle creative_ids in packages if provided (immediate association)
         if req.packages:
             with get_db_session() as session:
-                from src.core.database.models import Creative as DBCreative
-                from src.core.database.models import CreativeAssignment as DBAssignment
+                from core.database.models import Creative as DBCreative
+                from core.database.models import CreativeAssignment as DBAssignment
 
                 # Batch load all creatives upfront to avoid N+1 queries
                 all_creative_ids = []
@@ -3010,7 +3010,7 @@ async def _create_media_buy_impl(
                     # - Creatives may be synced before being assigned to products
                     # - A creative may be valid for product A but not product B
                     # - Same creative can be reused across packages if formats align
-                    from src.core.helpers import validate_creative_format_against_product
+                    from core.helpers import validate_creative_format_against_product
 
                     for package in req.packages:
                         if package.creative_ids and package.product_id:

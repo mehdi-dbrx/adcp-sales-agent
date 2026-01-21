@@ -10,9 +10,9 @@ from decimal import Decimal
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from sqlalchemy import or_, select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AdapterConfig, CurrencyLimit, Principal, Tenant, User
-from src.core.domain_config import extract_subdomain_from_host, get_sales_agent_domain, is_sales_agent_domain
+from core.database.database_session import get_db_session
+from core.database.models import AdapterConfig, CurrencyLimit, Principal, Tenant, User
+from core.domain_config import extract_subdomain_from_host, get_sales_agent_domain, is_sales_agent_domain
 
 logger = logging.getLogger(__name__)
 

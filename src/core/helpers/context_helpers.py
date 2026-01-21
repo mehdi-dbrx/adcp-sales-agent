@@ -5,9 +5,9 @@ import logging
 from fastmcp.server.context import Context
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.core.auth import get_principal_from_context
-from src.core.config_loader import set_current_tenant
-from src.core.tool_context import ToolContext
+from core.auth import get_principal_from_context
+from core.config_loader import set_current_tenant
+from core.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def get_principal_id_from_context(context: Context | ToolContext | None) -> str 
         # Try to load full tenant from database to get all fields (human_review_required, etc.)
         tenant = None
         try:
-            from src.core.config_loader import get_tenant_by_id
+            from core.config_loader import get_tenant_by_id
 
             tenant = get_tenant_by_id(context.tenant_id)
         except (SQLAlchemyError, RuntimeError) as e:

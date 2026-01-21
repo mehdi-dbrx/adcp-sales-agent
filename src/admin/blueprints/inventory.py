@@ -6,10 +6,10 @@ import logging
 from flask import Blueprint, jsonify, render_template, request, session
 from sqlalchemy import String, func, or_, select
 
-from src.admin.utils import get_tenant_config_from_db, require_auth, require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import GAMInventory, GAMOrder, MediaBuy, Principal, Tenant
+from admin.utils import get_tenant_config_from_db, require_auth, require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import GAMInventory, GAMOrder, MediaBuy, Principal, Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ def get_targeting_data(tenant_id):
     logger.info(f"Targeting data request for tenant: {tenant_id}")
     try:
         with get_db_session() as db_session:
-            from src.core.database.models import GAMInventory
+            from core.database.models import GAMInventory
 
             # Query custom targeting keys
             custom_keys_stmt = select(GAMInventory).where(
@@ -177,7 +177,7 @@ def get_targeting_values(tenant_id, key_id):
     """
     try:
         with get_db_session() as db_session:
-            from src.core.database.models import GAMInventory, Tenant
+            from core.database.models import GAMInventory, Tenant
 
             # Get tenant and verify it has GAM configured
             tenant = db_session.scalars(select(Tenant).filter_by(tenant_id=tenant_id)).first()
@@ -232,7 +232,7 @@ def get_targeting_values(tenant_id, key_id):
             from google.oauth2 import service_account as google_service_account
             from googleads import ad_manager, oauth2
 
-            from src.adapters.gam_inventory_discovery import GAMInventoryDiscovery
+            from adapters.gam_inventory_discovery import GAMInventoryDiscovery
 
             # Create authentication client based on configured method
             if has_service_account:
@@ -401,7 +401,7 @@ def sync_orders(tenant_id):
                 )
 
             # Import GAM sync functionality
-            from src.adapters.gam_order_sync import sync_gam_orders
+            from adapters.gam_order_sync import sync_gam_orders
 
             # Perform sync
             result = sync_gam_orders(
@@ -618,7 +618,7 @@ def analyze_ad_server_inventory(tenant_id):
                 return jsonify({"error": "No principal found for tenant"}), 404
 
             # Create principal object
-            from src.core.schemas import Principal as PrincipalSchema
+            from core.schemas import Principal as PrincipalSchema
 
             # Handle both string (SQLite) and dict (PostgreSQL JSONB) formats
             mappings = principal_obj.platform_mappings
@@ -636,7 +636,7 @@ def analyze_ad_server_inventory(tenant_id):
 
         # TODO: Get adapter instance and call actual discovery methods
         # For now, return mock analysis data
-        # from src.adapters import get_adapter
+        # from adapters import get_adapter
         # adapter = get_adapter(adapter_type, config, principal)
 
         # Mock analysis (real adapters would implement actual discovery)
@@ -685,7 +685,7 @@ def sync_inventory(tenant_id):
         404 Not Found if tenant doesn't exist
     """
     try:
-        from src.services.background_sync_service import start_inventory_sync_background
+        from services.background_sync_service import start_inventory_sync_background
 
         # Validate tenant exists
         with get_db_session() as db_session:
@@ -706,7 +706,7 @@ def sync_inventory(tenant_id):
                 )
 
             # Check if GAM is configured
-            from src.core.database.models import AdapterConfig
+            from core.database.models import AdapterConfig
 
             adapter_config = db_session.scalars(
                 select(AdapterConfig).filter_by(tenant_id=tenant_id, adapter_type="google_ad_manager")
@@ -833,7 +833,7 @@ def get_sync_status(tenant_id):
                 last_synced = db_session.scalar(last_sync_stmt)
 
                 # Get most recent sync job for this tenant
-                from src.core.database.models import SyncJob
+                from core.database.models import SyncJob
 
                 last_job_stmt = (
                     select(SyncJob)
@@ -889,7 +889,7 @@ def get_inventory_tree(tenant_id):
             # If so, invalidate the cache and rebuild
             from sqlalchemy import desc
 
-            from src.core.database.models import SyncJob
+            from core.database.models import SyncJob
 
             with get_db_session() as db_session:
                 last_sync = db_session.scalars(
@@ -920,7 +920,7 @@ def get_inventory_tree(tenant_id):
     logger.info(f"Building inventory tree for tenant: {tenant_id}, search: '{search}'")
     try:
         with get_db_session() as db_session:
-            from src.core.database.models import GAMInventory
+            from core.database.models import GAMInventory
 
             # Get all ad units (active only by default)
             stmt = select(GAMInventory).where(
@@ -1290,7 +1290,7 @@ def get_inventory_sizes(tenant_id):
 
         # Get inventory IDs from profile if provided
         if profile_id:
-            from src.core.database.models import InventoryProfile
+            from core.database.models import InventoryProfile
 
             with get_db_session() as db_session:
                 profile = db_session.scalars(

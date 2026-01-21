@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.admin.app import create_app
+from admin.app import create_app
 
 
 class TestAdminAppIntegration:

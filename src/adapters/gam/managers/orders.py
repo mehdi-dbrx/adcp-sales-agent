@@ -12,7 +12,7 @@ from typing import Any
 
 from googleads import ad_manager
 
-from src.adapters.gam.utils.timeout_handler import timeout
+from adapters.gam.utils.timeout_handler import timeout
 
 logger = logging.getLogger(__name__)
 
@@ -395,8 +395,8 @@ class GAMOrdersManager:
         if tenant_id:
             from sqlalchemy import select
 
-            from src.core.database.database_session import get_db_session
-            from src.core.database.models import AdapterConfig
+            from core.database.database_session import get_db_session
+            from core.database.models import AdapterConfig
 
             with get_db_session() as db_session:
                 stmt = select(AdapterConfig).filter_by(tenant_id=tenant_id)
@@ -481,7 +481,7 @@ class GAMOrdersManager:
             creative_placeholders: list[dict[str, Any]] = []
 
             if package.format_ids:
-                from src.core.format_resolver import get_format
+                from core.format_resolver import get_format
 
                 # Validate format types against product supported types
                 supported_format_types = impl_config.get("supported_format_types", ["display", "video", "native"])
@@ -620,8 +620,8 @@ class GAMOrdersManager:
             if package.creative_ids:
                 from sqlalchemy import select
 
-                from src.core.database.database_session import get_db_session
-                from src.core.database.models import Creative as DBCreative
+                from core.database.database_session import get_db_session
+                from core.database.models import Creative as DBCreative
 
                 # Collect unique creative sizes from uploaded creatives
                 creative_sizes = set()
@@ -711,8 +711,8 @@ class GAMOrdersManager:
                 goal_units = package.impressions
 
             # Apply line item naming template
-            from src.adapters.gam.utils.constants import GAM_NAME_LIMITS
-            from src.adapters.gam.utils.naming import (
+            from adapters.gam.utils.constants import GAM_NAME_LIMITS
+            from adapters.gam.utils.naming import (
                 apply_naming_template,
                 build_line_item_name_context,
                 truncate_name_with_suffix,
@@ -739,7 +739,7 @@ class GAMOrdersManager:
 
             if pricing_info:
                 # Use pricing info from AdCP request (AdCP PR #88)
-                from src.adapters.gam.pricing_compatibility import PricingCompatibility
+                from adapters.gam.pricing_compatibility import PricingCompatibility
 
                 pricing_model = pricing_info["pricing_model"]
                 is_fixed_price = pricing_info["is_fixed"]  # Fixed vs auction pricing (pricing type)

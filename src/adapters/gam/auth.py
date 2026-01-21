@@ -61,7 +61,7 @@ class GAMAuthManager:
     def _get_oauth_credentials(self):
         """Get OAuth credentials using refresh token and Pydantic configuration."""
         try:
-            from src.core.config import get_gam_oauth_config
+            from core.config import get_gam_oauth_config
 
             # Get validated configuration
             gam_config = get_gam_oauth_config()

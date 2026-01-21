@@ -366,8 +366,8 @@ class WebhookDeliveryService:
             # Get webhook configurations
             from sqlalchemy import select
 
-            from src.core.database.database_session import get_db_session
-            from src.core.database.models import PushNotificationConfig
+            from core.database.database_session import get_db_session
+            from core.database.models import PushNotificationConfig
 
             with get_db_session() as db:
                 stmt = select(PushNotificationConfig).filter_by(

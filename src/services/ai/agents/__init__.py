@@ -6,18 +6,18 @@ Each agent encapsulates a specific AI capability:
 - CreativeReviewAgent: Creative approval/rejection decisions
 """
 
-from src.services.ai.agents.naming_agent import (
+from services.ai.agents.naming_agent import (
     OrderName,
     build_naming_prompt,
     create_naming_agent,
     generate_name_async,
 )
-from src.services.ai.agents.policy_agent import (
+from services.ai.agents.policy_agent import (
     PolicyAnalysis,
     check_policy_compliance,
     create_policy_agent,
 )
-from src.services.ai.agents.review_agent import (
+from services.ai.agents.review_agent import (
     CreativeReviewResult,
     build_review_prompt,
     create_review_agent,

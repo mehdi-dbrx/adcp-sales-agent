@@ -17,8 +17,8 @@ from datetime import UTC, datetime
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Creative, CreativeAssignment, MediaBuy
+from core.database.database_session import get_db_session
+from core.database.models import Creative, CreativeAssignment, MediaBuy
 
 logger = logging.getLogger(__name__)
 

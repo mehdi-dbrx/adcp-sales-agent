@@ -12,8 +12,8 @@ from typing import Any
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import SyncJob
+from core.database.database_session import get_db_session
+from core.database.models import SyncJob
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ def start_inventory_sync_background(
     # Create sync job record
     with get_db_session() as db:
         # Get adapter type for the tenant
-        from src.core.database.models import AdapterConfig
+        from core.database.models import AdapterConfig
 
         adapter_config_stmt = select(AdapterConfig).filter_by(tenant_id=tenant_id)
         adapter_config = db.scalars(adapter_config_stmt).first()
@@ -166,9 +166,9 @@ def _run_sync_thread(
         import google.oauth2.service_account
         from googleads import ad_manager, oauth2
 
-        from src.adapters.gam_inventory_discovery import GAMInventoryDiscovery
-        from src.core.database.models import AdapterConfig, Tenant
-        from src.services.gam_inventory_service import GAMInventoryService
+        from adapters.gam_inventory_discovery import GAMInventoryDiscovery
+        from core.database.models import AdapterConfig, Tenant
+        from services.gam_inventory_service import GAMInventoryService
 
         # Get tenant and adapter config (fresh session per thread)
         with get_db_session() as db:
@@ -284,7 +284,7 @@ def _run_sync_thread(
             with get_db_session() as db:
                 from sqlalchemy import delete
 
-                from src.core.database.models import GAMInventory
+                from core.database.models import GAMInventory
 
                 stmt = delete(GAMInventory).where(GAMInventory.tenant_id == tenant_id)
                 db.execute(stmt)
@@ -372,7 +372,7 @@ def _run_sync_thread(
                 # Import here to avoid circular imports
                 from sqlalchemy import func
 
-                from src.core.database.models import GAMInventory
+                from core.database.models import GAMInventory
 
                 # Count total items by inventory_type
                 total_ad_units = (

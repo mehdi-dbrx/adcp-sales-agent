@@ -11,8 +11,8 @@ from typing import Any
 
 from sqlalchemy import func, select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import (
+from core.database.database_session import get_db_session
+from core.database.models import (
     AuthorizedProperty,
     CurrencyLimit,
     GAMInventory,

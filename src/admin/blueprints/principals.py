@@ -9,11 +9,11 @@ from datetime import UTC, datetime
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from sqlalchemy import func, select
 
-from src.admin.services import DashboardService
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import MediaBuy, Principal, PushNotificationConfig, Tenant
+from admin.services import DashboardService
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import MediaBuy, Principal, PushNotificationConfig, Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ def list_principals(tenant_id):
             chart_data_dict = dashboard_service.get_chart_data()
 
             # Get tenant config for features
-            from src.admin.utils import get_tenant_config_from_db
+            from admin.utils import get_tenant_config_from_db
 
             config = get_tenant_config_from_db(tenant_id)
             features = config.get("features", {})
@@ -406,7 +406,7 @@ def get_gam_advertisers(tenant_id):
         - Default behavior (limit=500) is fast but may not return all advertisers
     """
     try:
-        from src.adapters.google_ad_manager import GoogleAdManager
+        from adapters.google_ad_manager import GoogleAdManager
 
         # Get request parameters
         data = request.get_json() or {}
@@ -440,7 +440,7 @@ def get_gam_advertisers(tenant_id):
             # Initialize GAM adapter with adapter config
             try:
                 # Import Principal model
-                from src.core.schemas import Principal
+                from core.schemas import Principal
 
                 # Create a mock principal for GAM initialization
                 # Need dummy advertiser_id for GAM adapter validation, even though get_advertisers() doesn't use it
@@ -460,7 +460,7 @@ def get_gam_advertisers(tenant_id):
                     return jsonify({"error": "GAM network code not configured for this tenant"}), 400
 
                 # Use build_gam_config_from_adapter to handle both OAuth and service account
-                from src.adapters.gam import build_gam_config_from_adapter
+                from adapters.gam import build_gam_config_from_adapter
 
                 gam_config = build_gam_config_from_adapter(tenant.adapter_config)
 
@@ -616,7 +616,7 @@ def manage_webhooks(tenant_id, principal_id):
 def register_webhook(tenant_id, principal_id):
     """Register a new webhook for a principal."""
     try:
-        from src.core.webhook_validator import WebhookURLValidator
+        from core.webhook_validator import WebhookURLValidator
 
         url = request.form.get("url")
         auth_type = request.form.get("auth_type", "none")

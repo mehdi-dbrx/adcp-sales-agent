@@ -18,10 +18,10 @@ from authlib.integrations.flask_client import OAuth
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
 from sqlalchemy import select
 
-from src.admin.utils import is_super_admin
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant
-from src.core.domain_config import (
+from admin.utils import is_super_admin
+from core.database.database_session import get_db_session
+from core.database.models import Tenant
+from core.domain_config import (
     extract_subdomain_from_host,
     get_oauth_redirect_uri,
     get_sales_agent_url,
@@ -241,7 +241,7 @@ def login():
     # tenant.auth_setup_mode is only used when NO global OAuth is configured
     test_mode = os.environ.get("ADCP_AUTH_TEST_MODE", "").lower() == "true"
 
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     oidc_enabled = False
     oidc_configured = False
@@ -287,7 +287,7 @@ def login():
     # Check for tenant-specific OIDC configuration (multi-tenant or single-tenant)
     if tenant_context:
         # For detected tenant, check if it has OIDC configured
-        from src.core.database.models import TenantAuthConfig
+        from core.database.models import TenantAuthConfig
 
         with get_db_session() as db_session:
             config = db_session.scalars(select(TenantAuthConfig).filter_by(tenant_id=tenant_context)).first()
@@ -305,7 +305,7 @@ def login():
 
     elif is_single_tenant_mode():
         # Single-tenant mode: check default tenant's OIDC config
-        from src.core.database.models import TenantAuthConfig
+        from core.database.models import TenantAuthConfig
 
         with get_db_session() as db_session:
             tenant = db_session.scalars(select(Tenant).filter_by(tenant_id="default")).first()
@@ -371,7 +371,7 @@ def tenant_login(tenant_id):
             test_mode = tenant.auth_setup_mode if hasattr(tenant, "auth_setup_mode") else True
 
         # Check if tenant-specific OIDC is configured and enabled
-        from src.services.auth_config_service import get_oidc_config_for_auth
+        from services.auth_config_service import get_oidc_config_for_auth
 
         oidc_config = get_oidc_config_for_auth(tenant_id)
         oidc_enabled = bool(oidc_config)
@@ -385,7 +385,7 @@ def tenant_login(tenant_id):
     if oauth_configured and not just_logged_out:
         return redirect(url_for("auth.tenant_google_auth", tenant_id=tenant_id))
 
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     return render_template(
         "login.html",
@@ -620,7 +620,7 @@ def google_callback():
 
         # Unified flow: Always show tenant selector (with option to create new tenant)
         # No distinction between signup and login - keeps UX simple and consistent
-        from src.admin.domain_access import get_user_tenant_access
+        from admin.domain_access import get_user_tenant_access
 
         # Get all accessible tenants
         tenant_access = get_user_tenant_access(email)
@@ -634,7 +634,7 @@ def google_callback():
             with get_db_session() as db_session:
                 from sqlalchemy import select
 
-                from src.core.database.models import User
+                from core.database.models import User
 
                 stmt = select(User).filter_by(email=email, tenant_id=tenant.tenant_id)
                 existing_user = db_session.scalars(stmt).first()
@@ -668,7 +668,7 @@ def google_callback():
             with get_db_session() as db_session:
                 from sqlalchemy import select
 
-                from src.core.database.models import User
+                from core.database.models import User
 
                 stmt = select(User).filter_by(email=email, tenant_id=tenant.tenant_id)
                 existing_user = db_session.scalars(stmt).first()
@@ -685,7 +685,7 @@ def google_callback():
         session["available_tenants"] = list(tenant_dict.values())
 
         # In single-tenant mode, auto-select the tenant (skip selection screen)
-        from src.core.config_loader import is_single_tenant_mode
+        from core.config_loader import is_single_tenant_mode
 
         if is_single_tenant_mode() and len(session["available_tenants"]) == 1:
             # Auto-select the only tenant
@@ -693,7 +693,7 @@ def google_callback():
             tenant_id = tenant["tenant_id"]
 
             # Ensure User record exists
-            from src.admin.domain_access import ensure_user_in_tenant
+            from admin.domain_access import ensure_user_in_tenant
 
             user_name = session.get("user_name", email.split("@")[0].title())
             role = "admin" if tenant.get("is_admin") else "viewer"
@@ -763,7 +763,7 @@ def select_tenant():
             if tenant["tenant_id"] == tenant_id:
                 # Ensure User record exists in the database
                 # This is critical for require_tenant_access decorator to work
-                from src.admin.domain_access import ensure_user_in_tenant
+                from admin.domain_access import ensure_user_in_tenant
 
                 email = session["user"]
                 user_name = session.get("user_name", email.split("@")[0].title())
@@ -790,7 +790,7 @@ def select_tenant():
         flash("Invalid tenant selection", "error")
         return redirect(url_for("auth.select_tenant"))
 
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     return render_template(
         "choose_tenant.html",
@@ -807,7 +807,7 @@ def logout():
     idp_logout_url = None
 
     if tenant_id:
-        from src.core.database.models import TenantAuthConfig
+        from core.database.models import TenantAuthConfig
 
         with get_db_session() as db_session:
             config = db_session.scalars(select(TenantAuthConfig).filter_by(tenant_id=tenant_id)).first()
@@ -841,7 +841,7 @@ def test_auth():
     tenant_id = request.form.get("tenant_id")
 
     # In single-tenant mode, default to "default" tenant if not specified
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     if is_single_tenant_mode() and not tenant_id:
         tenant_id = "default"
@@ -953,7 +953,7 @@ def test_login_form():
     if os.environ.get("ADCP_AUTH_TEST_MODE", "").lower() != "true":
         abort(404)
 
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     return render_template("login.html", test_mode=True, test_only=True, single_tenant_mode=is_single_tenant_mode())
 
@@ -977,7 +977,7 @@ def gam_authorize(tenant_id):
 
     try:
         # Get GAM OAuth configuration
-        from src.core.config import get_gam_oauth_config
+        from core.config import get_gam_oauth_config
 
         try:
             gam_config = get_gam_oauth_config()
@@ -1061,7 +1061,7 @@ def gam_callback():
             return redirect(url_for("auth.login"))
 
         # Get GAM OAuth configuration
-        from src.core.config import get_gam_oauth_config
+        from core.config import get_gam_oauth_config
 
         gam_config = get_gam_oauth_config()
 
@@ -1121,7 +1121,7 @@ def gam_callback():
 
         # Store refresh token in tenant's adapter config
         with get_db_session() as db_session:
-            from src.core.database.models import AdapterConfig
+            from core.database.models import AdapterConfig
 
             tenant = db_session.scalars(select(Tenant).filter_by(tenant_id=tenant_id)).first()
             if not tenant:

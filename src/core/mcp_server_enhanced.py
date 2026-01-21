@@ -12,7 +12,7 @@ from fastmcp.server.context import Context as FastMCPContext
 from fastmcp.tools.tool import FunctionTool
 from pydantic import BaseModel
 
-from src.core.mcp_context_wrapper import MCPContextWrapper
+from core.mcp_context_wrapper import MCPContextWrapper
 
 
 class EnhancedMCPServer(FastMCP):

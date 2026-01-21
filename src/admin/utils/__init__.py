@@ -1,10 +1,10 @@
 """Admin utilities package."""
 
 # Export decorator
-from src.admin.utils.audit_decorator import log_admin_action
+from admin.utils.audit_decorator import log_admin_action
 
 # Export all helper functions (previously in utils.py)
-from src.admin.utils.helpers import (
+from admin.utils.helpers import (
     get_custom_targeting_mappings,
     get_tenant_config_from_db,
     is_super_admin,

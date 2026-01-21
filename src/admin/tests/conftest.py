@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from src.admin.app import create_app
+from admin.app import create_app
 
 
 @pytest.fixture

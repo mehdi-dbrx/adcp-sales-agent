@@ -5,9 +5,9 @@ from typing import Any
 import requests
 from adcp.types.aliases import Package as ResponsePackage
 
-from src.adapters.base import AdServerAdapter, CreativeEngineAdapter
-from src.adapters.constants import REQUIRED_UPDATE_ACTIONS
-from src.core.schemas import *
+from adapters.base import AdServerAdapter, CreativeEngineAdapter
+from adapters.constants import REQUIRED_UPDATE_ACTIONS
+from core.schemas import *
 
 
 class Kevel(AdServerAdapter):
@@ -219,7 +219,7 @@ class Kevel(AdServerAdapter):
                     unsupported_features.extend(features)
 
         if unsupported_features:
-            from src.core.schemas import Error
+            from core.schemas import Error
 
             error_msg = f"Unsupported targeting features for Kevel: {'; '.join(unsupported_features)}"
             self.log(f"[red]Error: {error_msg}[/red]")
@@ -652,7 +652,7 @@ class Kevel(AdServerAdapter):
         today: datetime,
     ) -> UpdateMediaBuyResponse:
         """Updates a media buy in Kevel using standardized actions."""
-        from src.core.schemas import Error
+        from core.schemas import Error
 
         self.log(f"Kevel.update_media_buy for {media_buy_id} with action {action}", dry_run_prefix=False)
 

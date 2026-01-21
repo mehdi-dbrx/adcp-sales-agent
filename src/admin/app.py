@@ -11,35 +11,35 @@ from flask_socketio import SocketIO, join_room
 from markupsafe import Markup
 from werkzeug.middleware.proxy_fix import ProxyFix as WerkzeugProxyFix
 
-from src.admin.blueprints.activity_stream import activity_stream_bp
-from src.admin.blueprints.adapters import adapters_bp
-from src.admin.blueprints.api import api_bp
-from src.admin.blueprints.auth import auth_bp, init_oauth
-from src.admin.blueprints.authorized_properties import authorized_properties_bp
-from src.admin.blueprints.core import core_bp
-from src.admin.blueprints.creative_agents import creative_agents_bp
-from src.admin.blueprints.creatives import creatives_bp
-from src.admin.blueprints.format_search import bp as format_search_bp
-from src.admin.blueprints.gam import gam_bp
-from src.admin.blueprints.inventory import inventory_bp
-from src.admin.blueprints.inventory_profiles import inventory_profiles_bp
-from src.admin.blueprints.oidc import oidc_bp
-from src.admin.blueprints.operations import operations_bp
-from src.admin.blueprints.policy import policy_bp
-from src.admin.blueprints.principals import principals_bp
-from src.admin.blueprints.products import products_bp
-from src.admin.blueprints.public import public_bp
-from src.admin.blueprints.publisher_partners import publisher_partners_bp
-from src.admin.blueprints.schemas import schemas_bp
-from src.admin.blueprints.settings import settings_bp, tenant_management_settings_bp
-from src.admin.blueprints.signals_agents import signals_agents_bp
+from admin.blueprints.activity_stream import activity_stream_bp
+from admin.blueprints.adapters import adapters_bp
+from admin.blueprints.api import api_bp
+from admin.blueprints.auth import auth_bp, init_oauth
+from admin.blueprints.authorized_properties import authorized_properties_bp
+from admin.blueprints.core import core_bp
+from admin.blueprints.creative_agents import creative_agents_bp
+from admin.blueprints.creatives import creatives_bp
+from admin.blueprints.format_search import bp as format_search_bp
+from admin.blueprints.gam import gam_bp
+from admin.blueprints.inventory import inventory_bp
+from admin.blueprints.inventory_profiles import inventory_profiles_bp
+from admin.blueprints.oidc import oidc_bp
+from admin.blueprints.operations import operations_bp
+from admin.blueprints.policy import policy_bp
+from admin.blueprints.principals import principals_bp
+from admin.blueprints.products import products_bp
+from admin.blueprints.public import public_bp
+from admin.blueprints.publisher_partners import publisher_partners_bp
+from admin.blueprints.schemas import schemas_bp
+from admin.blueprints.settings import settings_bp, tenant_management_settings_bp
+from admin.blueprints.signals_agents import signals_agents_bp
 
-# from src.admin.blueprints.tasks import tasks_bp  # Disabled - tasks eliminated in favor of workflow system
-from src.admin.blueprints.tenants import tenants_bp
-from src.admin.blueprints.users import users_bp
-from src.admin.blueprints.workflows import workflows_bp
-from src.core.config_loader import is_single_tenant_mode
-from src.core.domain_config import (
+# from admin.blueprints.tasks import tasks_bp  # Disabled - tasks eliminated in favor of workflow system
+from admin.blueprints.tenants import tenants_bp
+from admin.blueprints.users import users_bp
+from admin.blueprints.workflows import workflows_bp
+from core.config_loader import is_single_tenant_mode
+from core.domain_config import (
     get_session_cookie_domain,
     get_tenant_url,
     is_sales_agent_domain,
@@ -48,6 +48,17 @@ from src.core.domain_config import (
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Configure admin.app logger to use plain text format (not JSON)
+# This makes debug messages easier to read in Databricks logs
+if logger.handlers:
+    # Remove existing handlers
+    logger.handlers = []
+# Add plain text handler
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter("%(message)s"))
+logger.addHandler(handler)
+logger.propagate = False  # Don't propagate to root logger (prevents JSON formatting)
 
 
 # Custom ProxyFix for handling X-Script-Name and fixing redirect URLs
@@ -207,6 +218,7 @@ def create_app(config=None):
 
     # Initialize OAuth
     init_oauth(app)
+    logger.info("[ADMIN.APP] ✅ After init_oauth()")
 
     # Initialize Flask-Caching for improved performance
     from flask_caching import Cache
@@ -218,10 +230,14 @@ def create_app(config=None):
     app.config.update(cache_config)
     cache = Cache(app)
     app.cache = cache  # Make cache available to blueprints
+    logger.info("[ADMIN.APP] ✅ After Cache(app)")
 
     # Initialize SocketIO
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
     app.socketio = socketio
+    logger.info("[ADMIN.APP] ✅ After SocketIO()")
+
+    logger.info("[ADMIN.APP] 🔄 Before @app.before_request decorator")
 
     # Redirect external domain /admin requests to tenant subdomain
     @app.before_request
@@ -233,7 +249,7 @@ def create_app(config=None):
         """
         from flask import redirect, request
 
-        from src.core.config_loader import get_tenant_by_virtual_host
+        from core.config_loader import get_tenant_by_virtual_host
 
         # Check if this is an /admin request
         # Note: CustomProxyFix middleware strips /admin from request.path, so we check script_root
@@ -284,6 +300,8 @@ def create_app(config=None):
         logger.info(f"Redirecting external domain {apx_host}/admin to subdomain: {redirect_url}")
         return redirect(redirect_url, code=302)
 
+    logger.info("[ADMIN.APP] ✅ After @app.before_request decorator")
+
     # Debug: Log Set-Cookie headers on auth-related responses
     @app.after_request
     def log_auth_cookies(response):
@@ -312,6 +330,8 @@ def create_app(config=None):
                     )
         return response
 
+    logger.info("[ADMIN.APP] ✅ After @app.after_request (log_auth_cookies)")
+
     # Add context processor to make script_name and tenant available in templates
     @app.context_processor
     def inject_context():
@@ -319,8 +339,8 @@ def create_app(config=None):
         from flask import session
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import Tenant
+        from core.database.database_session import get_db_session
+        from core.database.models import Tenant
 
         context = {}
 
@@ -344,6 +364,8 @@ def create_app(config=None):
 
         return context
 
+    logger.info("[ADMIN.APP] ✅ After @app.context_processor")
+
     # Add after_request handler to fix hardcoded URLs in HTML responses
     @app.after_request
     def fix_hardcoded_urls(response):
@@ -363,6 +385,10 @@ def create_app(config=None):
             except Exception as e:
                 logger.error(f"Error fixing URLs in response: {e}")
         return response
+
+    logger.info("[ADMIN.APP] ✅ After @app.after_request (fix_hardcoded_urls)")
+
+    logger.info("[ADMIN.APP] 🔄 Before blueprint registrations")
 
     # Register blueprints
     app.register_blueprint(public_bp)  # Public routes (no auth required) - MUST BE FIRST
@@ -395,39 +421,56 @@ def create_app(config=None):
     app.register_blueprint(workflows_bp, url_prefix="/tenant")  # Workflow approval and review
     # app.register_blueprint(tasks_bp)  # Tasks management - Disabled, tasks eliminated in favor of workflow system
 
+    logger.info("[ADMIN.APP] ✅ After main blueprint registrations")
+
     # Import and register existing blueprints
+    logger.info("[ADMIN.APP] 🔄 Before importing tenant_management_api")
     try:
-        from src.admin.tenant_management_api import tenant_management_api
+        from admin.tenant_management_api import tenant_management_api
+        logger.info("[ADMIN.APP] ✅ Imported tenant_management_api")
 
         app.register_blueprint(tenant_management_api)
+        logger.info("[ADMIN.APP] ✅ Registered tenant_management_api")
     except ImportError:
         logger.warning("tenant_management_api blueprint not found")
 
+    logger.info("[ADMIN.APP] 🔄 Before importing sync_api")
     try:
-        from src.admin.sync_api import sync_api
+        from admin.sync_api import sync_api
+        logger.info("[ADMIN.APP] ✅ Imported sync_api")
 
         app.register_blueprint(sync_api, url_prefix="/api/sync")
+        logger.info("[ADMIN.APP] ✅ Registered sync_api")
     except ImportError:
         logger.warning("sync_api blueprint not found")
 
+    logger.info("[ADMIN.APP] 🔄 Before importing gam_reporting_api")
     try:
-        from src.adapters.gam_reporting_api import gam_reporting_api
+        from adapters.gam_reporting_api import gam_reporting_api
+        logger.info("[ADMIN.APP] ✅ Imported gam_reporting_api")
 
         app.register_blueprint(gam_reporting_api)
+        logger.info("[ADMIN.APP] ✅ Registered gam_reporting_api")
     except ImportError:
         logger.warning("gam_reporting_api blueprint not found")
+
+    logger.info("[ADMIN.APP] ✅ After additional blueprint imports")
 
     # Register adapter-specific routes
     register_adapter_routes(app)
 
+    logger.info("[ADMIN.APP] ✅ After register_adapter_routes()")
+
     # Register GAM inventory endpoints
     try:
-        from src.services.gam_inventory_service import create_inventory_endpoints
+        from services.gam_inventory_service import create_inventory_endpoints
 
         create_inventory_endpoints(app)
         logger.info("Registered GAM inventory endpoints")
     except ImportError:
         logger.warning("gam_inventory_service not found")
+
+    logger.info("[ADMIN.APP] ✅ After GAM inventory endpoints")
 
     # WebSocket handlers
     @socketio.on("connect")
@@ -448,6 +491,10 @@ def create_app(config=None):
             join_room(f"tenant_{tenant_id}")
             logger.info(f"Client {request.sid} subscribed to tenant {tenant_id}")
 
+    logger.info("[ADMIN.APP] ✅ After WebSocket handlers")
+
+    logger.info("[ADMIN.APP] 🔄 About to return app, socketio")
+
     return app, socketio
 
 
@@ -455,8 +502,8 @@ def register_adapter_routes(app):
     """Register adapter-specific configuration routes."""
     try:
         # Import adapter modules that have UI routes
-        from src.adapters.google_ad_manager import GoogleAdManager
-        from src.adapters.mock_ad_server import MockAdServer
+        from adapters.google_ad_manager import GoogleAdManager
+        from adapters.mock_ad_server import MockAdServer
 
         # Register routes for each adapter that supports UI routes
         # Note: We skip instantiation errors since routes are optional

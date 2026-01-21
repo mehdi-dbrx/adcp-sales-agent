@@ -13,16 +13,16 @@ from fastmcp.exceptions import ToolError
 from fastmcp.server.context import Context
 from fastmcp.tools.tool import ToolResult
 
-from src.core.tool_context import ToolContext
+from core.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 
 from adcp.types import PlatformDeployment, Pricing, Signal, SignalCatalogType
 
-from src.core.auth import get_principal_from_context, get_principal_object
-from src.core.config_loader import get_current_tenant
-from src.core.schemas import ActivateSignalResponse, GetSignalsRequest, GetSignalsResponse
-from src.core.testing_hooks import get_testing_context
+from core.auth import get_principal_from_context, get_principal_object
+from core.config_loader import get_current_tenant
+from core.schemas import ActivateSignalResponse, GetSignalsRequest, GetSignalsResponse
+from core.testing_hooks import get_testing_context
 
 
 def _get_principal_id_from_context(context: Context | ToolContext | None) -> str | None:
@@ -200,8 +200,8 @@ async def _get_signals_impl(req: GetSignalsRequest, context: Context | ToolConte
     # Per AdCP PR #113 and official schema, protocol fields (message, context_id)
     # are added by the protocol layer, not the domain response.
     # Convert library Signal types to our local Signal type for type compatibility
-    from src.core.schemas import Signal as LocalSignal
-    from src.core.schemas import SignalDeployment, SignalPricing
+    from core.schemas import Signal as LocalSignal
+    from core.schemas import SignalDeployment, SignalPricing
 
     local_signals = []
     for s in signals:
@@ -323,7 +323,7 @@ async def _activate_signal_impl(
         activation_success = True
         requires_approval = signal_id.startswith("premium_")  # Mock rule: premium signals need approval
 
-        from src.core.schemas import Error
+        from core.schemas import Error
 
         if requires_approval:
             # Create a human task for approval - return error response
@@ -364,7 +364,7 @@ async def _activate_signal_impl(
 
     except Exception as e:
         logger.error(f"Error activating signal {signal_id}: {e}")
-        from src.core.schemas import Error
+        from core.schemas import Error
 
         return ActivateSignalResponse(
             signal_id=signal_id,

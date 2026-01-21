@@ -18,9 +18,9 @@ from typing import Any
 import requests
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.webhook_authenticator import WebhookAuthenticator
-from src.core.webhook_validator import WebhookURLValidator
+from core.database.database_session import get_db_session
+from core.webhook_authenticator import WebhookAuthenticator
+from core.webhook_validator import WebhookURLValidator
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ def deliver_webhook_with_retry(delivery: WebhookDelivery) -> tuple[bool, dict[st
         - response_code: HTTP status code (if received)
         - error: Error message (if failed)
     """
-    from src.core.metrics import webhook_delivery_attempts, webhook_delivery_duration, webhook_delivery_total
+    from core.metrics import webhook_delivery_attempts, webhook_delivery_duration, webhook_delivery_total
 
     # Validate webhook URL for SSRF protection
     is_valid, error_msg = WebhookURLValidator.validate_webhook_url(delivery.webhook_url)
@@ -278,7 +278,7 @@ def _create_delivery_record(
         object_id: Optional object ID related to webhook
     """
     try:
-        from src.core.database.models import WebhookDeliveryRecord
+        from core.database.models import WebhookDeliveryRecord
 
         with get_db_session() as session:
             record = WebhookDeliveryRecord(
@@ -319,7 +319,7 @@ def _update_delivery_record(
         delivered_at: Timestamp of successful delivery
     """
     try:
-        from src.core.database.models import WebhookDeliveryRecord
+        from core.database.models import WebhookDeliveryRecord
 
         with get_db_session() as session:
             stmt = select(WebhookDeliveryRecord).filter_by(delivery_id=delivery_id)

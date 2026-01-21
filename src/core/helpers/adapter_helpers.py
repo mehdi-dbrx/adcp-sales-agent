@@ -4,14 +4,14 @@ from typing import Any
 
 from sqlalchemy import select
 
-from src.adapters.google_ad_manager import GoogleAdManager
-from src.adapters.kevel import Kevel
-from src.adapters.mock_ad_server import MockAdServer as MockAdServerAdapter
-from src.adapters.triton_digital import TritonDigital
-from src.core.config_loader import get_current_tenant
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AdapterConfig
-from src.core.schemas import Principal
+from adapters.google_ad_manager import GoogleAdManager
+from adapters.kevel import Kevel
+from adapters.mock_ad_server import MockAdServer as MockAdServerAdapter
+from adapters.triton_digital import TritonDigital
+from core.config_loader import get_current_tenant
+from core.database.database_session import get_db_session
+from core.database.models import AdapterConfig
+from core.schemas import Principal
 
 
 def get_adapter(

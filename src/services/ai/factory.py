@@ -4,7 +4,7 @@ import logging
 from functools import lru_cache
 from typing import Any
 
-from src.services.ai.config import (
+from services.ai.config import (
     TenantAIConfig,
     build_model_string,
     get_platform_defaults,

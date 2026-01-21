@@ -4,8 +4,8 @@ from typing import Any
 
 from rich.console import Console
 
-from src.core.audit_logger import get_audit_logger
-from src.core.schemas import (
+from core.audit_logger import get_audit_logger
+from core.schemas import (
     AdapterGetMediaBuyDeliveryResponse,
     AssetStatus,
     CheckMediaBuyStatusResponse,

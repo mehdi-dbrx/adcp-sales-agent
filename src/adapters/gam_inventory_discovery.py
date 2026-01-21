@@ -23,9 +23,9 @@ import pytz
 from googleads import ad_manager
 from zeep.helpers import serialize_object
 
-from src.adapters.gam.utils.error_handler import with_retry
-from src.adapters.gam.utils.logging import logger
-from src.adapters.gam.utils.timeout_handler import timeout
+from adapters.gam.utils.error_handler import with_retry
+from adapters.gam.utils.logging import logger
+from adapters.gam.utils.timeout_handler import timeout
 
 
 class AdUnitStatus(Enum):

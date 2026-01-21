@@ -106,7 +106,7 @@ def init_db(exit_on_error=False):
             now = datetime.now(UTC)
             default_tenant = Tenant(
                 tenant_id="default",
-                name="Default Publisher",
+                name="TF1",
                 subdomain="default",  # Proper subdomain routing
                 is_active=True,
                 billing_plan="standard",
@@ -348,7 +348,7 @@ def init_db(exit_on_error=False):
 ║                                                                  ║
 ║  A default tenant has been created for quick start:              ║
 ║                                                                  ║
-║  🏢 Tenant: Default Publisher                                    ║
+║  🏢 Tenant: TF1                                                  ║
 ║  🌐 URL: http://localhost:8080                                   ║
 ║                                                                  ║
 ║  🔑 Admin Token (x-adcp-auth header):                            ║
@@ -385,7 +385,7 @@ def init_db(exit_on_error=False):
 ║                                                                          ║
 ╠══════════════════════════════════════════════════════════════════════════╣
 ║                                                                          ║
-║  🏢 Default Tenant: Default Publisher                                    ║
+║  🏢 Default Tenant: TF1                                                  ║
 ║  🔑 Principal Token: test-token                                          ║
 ║  🌐 Admin UI: http://localhost:8001                                      ║
 ║     Login: test_super_admin@example.com / test123                        ║

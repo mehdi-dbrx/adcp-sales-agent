@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import urlparse
 
-from src.core.schemas import AssetStatus
+from core.schemas import AssetStatus
 
 from ..utils.validation import GAMValidator
 

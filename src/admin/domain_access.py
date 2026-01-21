@@ -9,9 +9,9 @@ import logging
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant, User
-from src.core.domain_config import get_super_admin_domain
+from core.database.database_session import get_db_session
+from core.database.models import Tenant, User
+from core.domain_config import get_super_admin_domain
 
 logger = logging.getLogger(__name__)
 

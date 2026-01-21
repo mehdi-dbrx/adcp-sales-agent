@@ -1,9 +1,10 @@
 """Startup configuration and validation for AdCP Sales Agent."""
 
 import logging
+import os
 
-from src.core.config import validate_configuration
-from src.core.logging_config import setup_oauth_logging, setup_structured_logging
+from core.config import validate_configuration
+from core.logging_config import setup_oauth_logging, setup_structured_logging
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,17 @@ def initialize_application() -> None:
         validate_configuration()
         logger.info("Configuration validation passed")
 
+        # Initialize Lakebase token refresh if using Lakebase
+        if os.environ.get("LAKEBASE_HOST"):
+            try:
+                # Note: Import uses relative import since src. is patched in wheel
+                from core.database.lakebase_token_refresh import start_token_refresh_thread
+                start_token_refresh_thread()
+                logger.info("Lakebase token refresh initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Lakebase token refresh: {e}")
+                # Don't fail startup if token refresh fails - connection will fail later with clearer error
+
         logger.info("Application initialization completed successfully")
 
     except Exception as e:
@@ -44,7 +56,7 @@ def validate_startup_requirements() -> None:
     This is useful for health checks and lightweight validation.
     """
     try:
-        from src.core.config import get_config
+        from core.config import get_config
 
         # Just check that config can be loaded
         get_config()

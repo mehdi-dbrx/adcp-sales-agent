@@ -12,7 +12,7 @@ Key features:
 - Testable in isolation
 
 Usage:
-    from src.core.utils.mcp_client import create_mcp_client
+    from core.utils.mcp_client import create_mcp_client
 
     async with create_mcp_client(
         agent_url="https://example.com/mcp",

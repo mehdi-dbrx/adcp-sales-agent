@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, Any, TypedDict
 if TYPE_CHECKING:
     from fastmcp import Context
 
-    from src.core.database.models import Product as DBProduct
-    from src.core.schemas import Creative, FormatId, PackageRequest, Product
-    from src.core.testing_context import TestingContext
-    from src.core.tool_context import ToolContext
+    from core.database.models import Product as DBProduct
+    from core.schemas import Creative, FormatId, PackageRequest, Product
+    from core.testing_context import TestingContext
+    from core.tool_context import ToolContext
 
-from src.core.schemas import Creative
+from core.schemas import Creative
 
 
 class FormatParameters(TypedDict, total=False):
@@ -411,7 +411,7 @@ def validate_creative_format_against_product(
         Format IDs should already be normalized before calling this function.
 
     Example:
-        >>> from src.core.schemas import FormatId, Product
+        >>> from core.schemas import FormatId, Product
         >>> creative_format = FormatId(agent_url="https://creative.example.com", id="banner_300x250")
         >>> is_valid, error = validate_creative_format_against_product(creative_format, product)
         >>> if not is_valid:
@@ -510,7 +510,7 @@ def process_and_upload_package_creatives(
     # Lazy import to avoid circular dependency
     from fastmcp.exceptions import ToolError
 
-    from src.core.tools.creatives import _sync_creatives_impl
+    from core.tools.creatives import _sync_creatives_impl
 
     logger = logging.getLogger(__name__)
     uploaded_by_product: dict[str, list[str]] = {}

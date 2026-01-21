@@ -14,9 +14,9 @@ from adcp import create_a2a_webhook_payload, create_mcp_webhook_payload
 from adcp.types import McpWebhookPayload
 from adcp.webhooks import GeneratedTaskStatus
 
-from src.core.database.database_session import DatabaseManager
-from src.core.database.models import Context, ObjectWorkflowMapping, WorkflowStep
-from src.services.protocol_webhook_service import get_protocol_webhook_service
+from core.database.database_session import DatabaseManager
+from core.database.models import Context, ObjectWorkflowMapping, WorkflowStep
+from services.protocol_webhook_service import get_protocol_webhook_service
 
 logger = logging.getLogger(__name__)
 
@@ -582,7 +582,7 @@ class ContextManager(DatabaseManager):
         try:
             import requests
 
-            from src.core.database.models import PushNotificationConfig
+            from core.database.models import PushNotificationConfig
 
             # Get object mappings for this step
             stmt = select(ObjectWorkflowMapping).filter_by(step_id=step.step_id)

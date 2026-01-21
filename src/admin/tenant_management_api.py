@@ -10,8 +10,8 @@ from functools import wraps
 from flask import Blueprint, jsonify, request
 from sqlalchemy import delete, func, select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import (
+from core.database.database_session import get_db_session
+from core.database.models import (
     AdapterConfig,
     AuditLog,
     MediaBuy,
@@ -67,7 +67,7 @@ def health_check():
 @require_tenant_management_api_key
 def list_tenants():
     """List all tenants."""
-    from src.core.database.models import AdapterConfig
+    from core.database.models import AdapterConfig
 
     with get_db_session() as db_session:
         try:
@@ -116,11 +116,11 @@ def list_tenants():
 def create_tenant():
     """Create a new tenant."""
 
-    from src.core.database.models import AdapterConfig
+    from core.database.models import AdapterConfig
 
     with get_db_session() as db_session:
         try:
-            from src.core.webhook_validator import WebhookURLValidator
+            from core.webhook_validator import WebhookURLValidator
 
             data = request.get_json()
 
@@ -396,7 +396,7 @@ def update_tenant(tenant_id):
             if not tenant:
                 return jsonify({"error": "Tenant not found"}), 404
 
-            from src.core.webhook_validator import WebhookURLValidator
+            from core.webhook_validator import WebhookURLValidator
 
             data = request.get_json()
 

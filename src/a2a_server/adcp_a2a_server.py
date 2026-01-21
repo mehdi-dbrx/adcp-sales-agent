@@ -60,46 +60,46 @@ from datetime import UTC, datetime
 
 from sqlalchemy import select
 
-from src.core.audit_logger import get_audit_logger
-from src.core.auth_utils import get_principal_from_token
-from src.core.config_loader import get_current_tenant
-from src.core.database.models import PushNotificationConfig as DBPushNotificationConfig
-from src.core.domain_config import get_a2a_server_url, get_sales_agent_domain
-from src.core.schemas import CreativeStatusEnum
-from src.core.testing_hooks import AdCPTestContext
-from src.core.tool_context import ToolContext
-from src.core.tools import (
+from core.audit_logger import get_audit_logger
+from core.auth_utils import get_principal_from_token
+from core.config_loader import get_current_tenant
+from core.database.models import PushNotificationConfig as DBPushNotificationConfig
+from core.domain_config import get_a2a_server_url, get_sales_agent_domain
+from core.schemas import CreativeStatusEnum
+from core.testing_hooks import AdCPTestContext
+from core.tool_context import ToolContext
+from core.tools import (
     create_media_buy_raw as core_create_media_buy_tool,
 )
-from src.core.tools import (
+from core.tools import (
     get_media_buy_delivery_raw as core_get_media_buy_delivery_tool,
 )
-from src.core.tools import (
+from core.tools import (
     get_products_raw as core_get_products_tool,
 )
 
 # Signals tools removed - should come from dedicated signals agents, not sales agent
-from src.core.tools import (
+from core.tools import (
     list_authorized_properties_raw as core_list_authorized_properties_tool,
 )
-from src.core.tools import (
+from core.tools import (
     list_creative_formats_raw as core_list_creative_formats_tool,
 )
-from src.core.tools import (
+from core.tools import (
     list_creatives_raw as core_list_creatives_tool,
 )
-from src.core.tools import (
+from core.tools import (
     sync_creatives_raw as core_sync_creatives_tool,
 )
-from src.core.tools import (
+from core.tools import (
     update_media_buy_raw as core_update_media_buy_tool,
 )
-from src.core.tools import (
+from core.tools import (
     update_performance_index_raw as core_update_performance_index_tool,
 )
 from adcp import create_a2a_webhook_payload
 from adcp.types import GeneratedTaskStatus
-from src.services.protocol_webhook_service import get_protocol_webhook_service
+from services.protocol_webhook_service import get_protocol_webhook_service
 
 
 def _get_sales_agent_version() -> str:
@@ -217,7 +217,7 @@ class AdCPRequestHandler(RequestHandler):
             ValueError: If authentication fails
         """
         # Import tenant resolution functions
-        from src.core.config_loader import (
+        from core.config_loader import (
             get_tenant_by_id,
             get_tenant_by_subdomain,
             get_tenant_by_virtual_host,
@@ -481,7 +481,7 @@ class AdCPRequestHandler(RequestHandler):
         """
         try:
             # Import response classes - for union types, import the concrete variants
-            from src.core.schemas import (
+            from core.schemas import (
                 CreateMediaBuyError,
                 CreateMediaBuySuccess,
                 GetMediaBuyDeliveryResponse,
@@ -1118,7 +1118,7 @@ class AdCPRequestHandler(RequestHandler):
         """
         from a2a.types import InvalidParamsError, TaskNotFoundError
 
-        from src.core.database.database_session import get_db_session
+        from core.database.database_session import get_db_session
 
         try:
             # Get authentication token
@@ -1180,8 +1180,8 @@ class AdCPRequestHandler(RequestHandler):
 
         from a2a.types import InvalidParamsError
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import PushNotificationConfig as DBPushNotificationConfig
+        from core.database.database_session import get_db_session
+        from core.database.models import PushNotificationConfig as DBPushNotificationConfig
 
         try:
             # Get authentication token
@@ -1298,8 +1298,8 @@ class AdCPRequestHandler(RequestHandler):
 
         Returns all active push notification configurations for the authenticated principal.
         """
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import PushNotificationConfig as DBPushNotificationConfig
+        from core.database.database_session import get_db_session
+        from core.database.models import PushNotificationConfig as DBPushNotificationConfig
 
         try:
             # Get authentication token
@@ -1357,8 +1357,8 @@ class AdCPRequestHandler(RequestHandler):
 
         from a2a.types import InvalidParamsError, TaskNotFoundError
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import PushNotificationConfig as DBPushNotificationConfig
+        from core.database.database_session import get_db_session
+        from core.database.models import PushNotificationConfig as DBPushNotificationConfig
 
         try:
             # Get authentication token
@@ -1898,7 +1898,7 @@ class AdCPRequestHandler(RequestHandler):
 
             # Build request from parameters (all optional)
             # Use local schema (extends library type) for proper type compatibility
-            from src.core.schemas import ListCreativeFormatsRequest
+            from core.schemas import ListCreativeFormatsRequest
 
             req = ListCreativeFormatsRequest(
                 type=parameters.get("type"),
@@ -2609,7 +2609,7 @@ def main():
     # Add debug endpoint for tenant detection
     from starlette.routing import Route
 
-    from src.core.config_loader import get_tenant_by_virtual_host
+    from core.config_loader import get_tenant_by_virtual_host
 
     async def debug_tenant_endpoint(request):
         """Debug endpoint to check tenant detection from headers."""

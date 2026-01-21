@@ -30,7 +30,7 @@ from fastmcp.server.context import Context
 from fastmcp.tools.tool import ToolResult
 from pydantic import ValidationError
 
-from src.core.tool_context import ToolContext
+from core.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 
@@ -80,11 +80,11 @@ def _ensure_backward_compatible_format(f: FormatT) -> FormatT:
     return f
 
 
-from src.core.audit_logger import get_audit_logger
-from src.core.auth import get_principal_from_context
-from src.core.config_loader import get_current_tenant, set_current_tenant
-from src.core.schemas import ListCreativeFormatsRequest, ListCreativeFormatsResponse
-from src.core.validation_helpers import format_validation_error
+from core.audit_logger import get_audit_logger
+from core.auth import get_principal_from_context
+from core.config_loader import get_current_tenant, set_current_tenant
+from core.schemas import ListCreativeFormatsRequest, ListCreativeFormatsResponse
+from core.validation_helpers import format_validation_error
 
 
 def _list_creative_formats_impl(
@@ -120,7 +120,7 @@ def _list_creative_formats_impl(
     # Get formats from all registered creative agents via registry
     import asyncio
 
-    from src.core.creative_agent_registry import get_creative_agent_registry
+    from core.creative_agent_registry import get_creative_agent_registry
 
     registry = get_creative_agent_registry()
 

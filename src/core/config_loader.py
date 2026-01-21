@@ -15,8 +15,8 @@ from typing import Any
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant
+from core.database.database_session import get_db_session
+from core.database.models import Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +116,7 @@ def get_default_tenant() -> dict[str, Any] | None:
                 tenant = db_session.scalars(stmt).first()
 
             if tenant:
-                from src.core.utils.tenant_utils import serialize_tenant_to_dict
+                from core.utils.tenant_utils import serialize_tenant_to_dict
 
                 return serialize_tenant_to_dict(tenant)
             return None
@@ -201,7 +201,7 @@ def get_tenant_by_subdomain(subdomain: str) -> dict[str, Any] | None:
             tenant = db_session.scalars(stmt).first()
 
             if tenant:
-                from src.core.utils.tenant_utils import serialize_tenant_to_dict
+                from core.utils.tenant_utils import serialize_tenant_to_dict
 
                 return serialize_tenant_to_dict(tenant)
             return None
@@ -227,7 +227,7 @@ def get_tenant_by_id(tenant_id: str) -> dict[str, Any] | None:
             tenant = db_session.scalars(stmt).first()
 
             if tenant:
-                from src.core.utils.tenant_utils import serialize_tenant_to_dict
+                from core.utils.tenant_utils import serialize_tenant_to_dict
 
                 return serialize_tenant_to_dict(tenant)
             return None
@@ -246,7 +246,7 @@ def get_tenant_by_virtual_host(virtual_host: str) -> dict[str, Any] | None:
             tenant = db_session.scalars(stmt).first()
 
             if tenant:
-                from src.core.utils.tenant_utils import serialize_tenant_to_dict
+                from core.utils.tenant_utils import serialize_tenant_to_dict
 
                 return serialize_tenant_to_dict(tenant)
             return None
@@ -295,7 +295,7 @@ def ensure_default_tenant_exists() -> dict[str, Any] | None:
 
             if existing:
                 logger.debug(f"Tenant already exists: {existing.name}")
-                from src.core.utils.tenant_utils import serialize_tenant_to_dict
+                from core.utils.tenant_utils import serialize_tenant_to_dict
 
                 return serialize_tenant_to_dict(existing)
 
@@ -315,7 +315,7 @@ def ensure_default_tenant_exists() -> dict[str, Any] | None:
             now = datetime.now(UTC)
             default_tenant = Tenant(
                 tenant_id="default",
-                name="Default Publisher",
+                name="TF1",
                 subdomain="default",  # Required field for routing
                 ad_server="mock",  # Start with mock adapter, user can configure later
                 authorized_emails=authorized_emails,
@@ -331,7 +331,7 @@ def ensure_default_tenant_exists() -> dict[str, Any] | None:
 
             logger.info(f"Created default tenant: {default_tenant.name} (id: {default_tenant.tenant_id})")
 
-            from src.core.utils.tenant_utils import serialize_tenant_to_dict
+            from core.utils.tenant_utils import serialize_tenant_to_dict
 
             return serialize_tenant_to_dict(default_tenant)
 

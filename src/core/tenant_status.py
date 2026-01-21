@@ -8,8 +8,8 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant
+from core.database.database_session import get_db_session
+from core.database.models import Tenant
 
 logger = logging.getLogger(__name__)
 

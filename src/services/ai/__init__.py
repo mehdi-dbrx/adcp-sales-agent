@@ -6,7 +6,7 @@ This module provides:
 - configure_logfire: Optional Logfire observability setup
 
 Usage:
-    from src.services.ai import AIServiceFactory, TenantAIConfig
+    from services.ai import AIServiceFactory, TenantAIConfig
 
     # Create factory (singleton pattern)
     factory = AIServiceFactory()
@@ -27,13 +27,13 @@ Configuration:
     Per-tenant overrides are stored in the `ai_config` JSON column on Tenant.
 """
 
-from src.services.ai.config import (
+from services.ai.config import (
     ModelSettings,
     TenantAIConfig,
     build_model_string,
     get_platform_defaults,
 )
-from src.services.ai.factory import (
+from services.ai.factory import (
     AIServiceFactory,
     configure_logfire,
     get_factory,

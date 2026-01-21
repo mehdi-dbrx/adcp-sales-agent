@@ -20,10 +20,10 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.adapters.gam.client import GAMClientManager
-from src.adapters.gam.managers.inventory import GAMInventoryManager
-from src.adapters.gam.managers.orders import GAMOrdersManager
-from src.core.database.models import SyncJob
+from adapters.gam.client import GAMClientManager
+from adapters.gam.managers.inventory import GAMInventoryManager
+from adapters.gam.managers.orders import GAMOrdersManager
+from core.database.models import SyncJob
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +118,8 @@ class GAMSyncManager:
                 )
 
                 # Save inventory to database - this would be delegated to inventory service
-                from src.adapters.gam_inventory_discovery import GAMInventoryDiscovery
-                from src.services.gam_inventory_service import GAMInventoryService
+                from adapters.gam_inventory_discovery import GAMInventoryDiscovery
+                from services.gam_inventory_service import GAMInventoryService
 
                 inventory_service = GAMInventoryService(db_session)
 
@@ -342,7 +342,7 @@ class GAMSyncManager:
                 logger.info("[DRY RUN] Simulated selective sync completed")
             else:
                 # Get discovery instance
-                from src.adapters.gam_inventory_discovery import GAMInventoryDiscovery
+                from adapters.gam_inventory_discovery import GAMInventoryDiscovery
 
                 discovery = self.inventory_manager._get_discovery()
 
@@ -354,7 +354,7 @@ class GAMSyncManager:
                 )
 
                 # Save inventory to database
-                from src.services.gam_inventory_service import GAMInventoryService
+                from services.gam_inventory_service import GAMInventoryService
 
                 inventory_service = GAMInventoryService(db_session)
                 # Only save real discovery instances to DB, not mock instances

@@ -6,9 +6,9 @@ import logging
 from flask import Blueprint
 from sqlalchemy import select
 
-from src.admin.utils import require_auth, require_tenant_access
-from src.core.database.models import MediaBuy, MediaPackage, PushNotificationConfig
-from src.services.protocol_webhook_service import get_protocol_webhook_service
+from admin.utils import require_auth, require_tenant_access
+from core.database.models import MediaBuy, MediaPackage, PushNotificationConfig
+from services.protocol_webhook_service import get_protocol_webhook_service
 from a2a.types import TaskState
 from adcp.types import CreateMediaBuySuccessResponse, GeneratedTaskStatus as AdcpTaskStatus, Package
 from adcp import create_a2a_webhook_payload, create_mcp_webhook_payload
@@ -46,8 +46,8 @@ def reporting(tenant_id):
     # Import needed for this function
     from flask import render_template, session
 
-    from src.core.database.database_session import get_db_session
-    from src.core.database.models import Tenant
+    from core.database.database_session import get_db_session
+    from core.database.models import Tenant
 
     # Verify tenant access
     if session.get("role") != "super_admin" and session.get("tenant_id") != tenant_id:
@@ -89,9 +89,9 @@ def media_buy_detail(tenant_id, media_buy_id):
     """View media buy details with workflow status."""
     from flask import render_template
 
-    from src.core.context_manager import ContextManager
-    from src.core.database.database_session import get_db_session
-    from src.core.database.models import (
+    from core.context_manager import ContextManager
+    from core.database.database_session import get_db_session
+    from core.database.models import (
         Creative,
         CreativeAssignment,
         MediaBuy,
@@ -180,7 +180,7 @@ def media_buy_detail(tenant_id, media_buy_id):
                     break
 
             # Get computed readiness state (not just raw database status)
-            from src.admin.services.media_buy_readiness_service import MediaBuyReadinessService
+            from admin.services.media_buy_readiness_service import MediaBuyReadinessService
 
             readiness = MediaBuyReadinessService.get_readiness_state(media_buy_id, tenant_id, db_session)
             computed_state = readiness["state"]
@@ -205,11 +205,11 @@ def media_buy_detail(tenant_id, media_buy_id):
                 try:
                     from datetime import UTC, datetime, timedelta
 
-                    from src.core.config_loader import set_current_tenant
-                    from src.core.database.models import Tenant
-                    from src.core.helpers.adapter_helpers import get_adapter
-                    from src.core.schemas import Principal as PrincipalSchema
-                    from src.core.schemas import ReportingPeriod
+                    from core.config_loader import set_current_tenant
+                    from core.database.models import Tenant
+                    from core.helpers.adapter_helpers import get_adapter
+                    from core.schemas import Principal as PrincipalSchema
+                    from core.schemas import ReportingPeriod
 
                     # Get adapter for this principal
                     if principal:
@@ -290,8 +290,8 @@ def approve_media_buy(tenant_id, media_buy_id, **kwargs):
     from flask import flash, redirect, request, url_for
     from sqlalchemy.orm import attributes
 
-    from src.core.database.database_session import get_db_session
-    from src.core.database.models import ObjectWorkflowMapping, WorkflowStep
+    from core.database.database_session import get_db_session
+    from core.database.models import ObjectWorkflowMapping, WorkflowStep
 
     try:
         action = request.form.get("action")  # "approve" or "reject"
@@ -359,7 +359,7 @@ def approve_media_buy(tenant_id, media_buy_id, **kwargs):
 
                 if media_buy and media_buy.status == "pending_approval":
                     # Check if all creatives are approved before moving to scheduled
-                    from src.core.database.models import Creative, CreativeAssignment
+                    from core.database.models import Creative, CreativeAssignment
 
                     stmt_assignments = select(CreativeAssignment).filter_by(
                         tenant_id=tenant_id, media_buy_id=media_buy_id
@@ -423,7 +423,7 @@ def approve_media_buy(tenant_id, media_buy_id, **kwargs):
                     # Execute adapter creation for approved media buy
                     # This creates the order/line items in GAM (or other adapter)
                     # Uses the same logic as auto-approved media buys
-                    from src.core.tools.media_buy_create import execute_approved_media_buy
+                    from core.tools.media_buy_create import execute_approved_media_buy
 
                     logger.info(f"[APPROVAL] Executing adapter creation for approved media buy {media_buy_id}")
                     success, error_msg = execute_approved_media_buy(media_buy_id, tenant_id)
@@ -612,7 +612,7 @@ def trigger_delivery_webhook(tenant_id, media_buy_id, **kwargs):
     """Trigger a delivery report webhook for a media buy manually."""
     from flask import flash, redirect, url_for
 
-    from src.services.delivery_webhook_scheduler import get_delivery_webhook_scheduler
+    from services.delivery_webhook_scheduler import get_delivery_webhook_scheduler
 
     try:
         # Trigger webhook using scheduler - pass IDs to avoid detached instance errors
@@ -638,9 +638,9 @@ def webhooks(tenant_id, **kwargs):
     """Display webhook delivery activity dashboard."""
     from flask import render_template, request
 
-    from src.core.database.database_session import get_db_session
-    from src.core.database.models import AuditLog, MediaBuy, Tenant
-    from src.core.database.models import Principal as ModelPrincipal
+    from core.database.database_session import get_db_session
+    from core.database.models import AuditLog, MediaBuy, Tenant
+    from core.database.models import Principal as ModelPrincipal
 
     try:
         with get_db_session() as db:

@@ -21,7 +21,7 @@ from fastmcp.server.context import Context
 from fastmcp.server.dependencies import get_http_headers
 from pydantic import BaseModel
 
-from src.core.tool_context import ToolContext
+from core.tool_context import ToolContext
 
 
 class CampaignEvent(str, Enum):

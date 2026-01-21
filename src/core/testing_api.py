@@ -10,7 +10,7 @@ from datetime import datetime
 from fastmcp.server.context import Context
 from pydantic import BaseModel
 
-from src.core.testing_hooks import (
+from core.testing_hooks import (
     CampaignEvent,
     get_session_manager,
     get_testing_context,

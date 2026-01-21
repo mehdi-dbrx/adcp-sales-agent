@@ -16,6 +16,21 @@ class DatabaseConfig:
     def get_db_config() -> dict[str, Any]:
         """Get PostgreSQL configuration from environment."""
 
+        # Check if using Lakebase with service principal (token refresh)
+        lakebase_host = os.environ.get("LAKEBASE_HOST")
+        if lakebase_host:
+            # Use Lakebase token refresh mechanism
+            # Note: Import uses relative import since src. is patched in wheel
+            try:
+                from core.database.lakebase_token_refresh import get_lakebase_connection_string
+                database_url = get_lakebase_connection_string()
+                return DatabaseConfig._parse_database_url(database_url)
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to get Lakebase connection string: {e}", exc_info=True)
+                raise RuntimeError(f"Failed to initialize Lakebase connection: {e}") from e
+
         # Support DATABASE_URL for easy deployment (Heroku, Railway, Fly.io, etc.)
         database_url = os.environ.get("DATABASE_URL")
         if database_url:

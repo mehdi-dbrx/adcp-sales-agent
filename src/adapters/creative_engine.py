@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.core.schemas import Creative, CreativeApprovalStatus
+from core.schemas import Creative, CreativeApprovalStatus
 
 
 class CreativeEngineAdapter(ABC):

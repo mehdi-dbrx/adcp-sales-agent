@@ -4,8 +4,8 @@ from typing import Any
 
 from adcp.types.aliases import Package as ResponsePackage
 
-from src.adapters.base import AdServerAdapter
-from src.core.schemas import (
+from adapters.base import AdServerAdapter
+from core.schemas import (
     AdapterGetMediaBuyDeliveryResponse,
     AssetStatus,
     CheckMediaBuyStatusResponse,
@@ -161,8 +161,8 @@ class MockAdServer(AdServerAdapter):
 
     def _create_workflow_step(self, step_type: str, status: str, request_data: dict) -> dict[str, Any]:
         """Create a workflow step for async HITL operations."""
-        from src.core.config_loader import get_current_tenant
-        from src.core.context_manager import get_context_manager
+        from core.config_loader import get_current_tenant
+        from core.context_manager import get_context_manager
 
         # Get context manager and tenant info
         ctx_manager = get_context_manager()
@@ -240,7 +240,7 @@ class MockAdServer(AdServerAdapter):
             time.sleep(delay_ms / 1000)
 
             try:
-                from src.core.context_manager import get_context_manager
+                from core.context_manager import get_context_manager
 
                 ctx_manager = get_context_manager()
 
@@ -383,7 +383,7 @@ class MockAdServer(AdServerAdapter):
         Returns:
             CreateMediaBuyResponse with simulated media buy
         """
-        from src.adapters.test_scenario_parser import has_test_keywords, parse_test_scenario
+        from adapters.test_scenario_parser import has_test_keywords, parse_test_scenario
 
         # Log pricing model info if provided (AdCP PR #88)
         if package_pricing_info:
@@ -610,7 +610,7 @@ class MockAdServer(AdServerAdapter):
         media_buy_id = f"buy_{request.po_number}" if request.po_number else f"buy_{uuid.uuid4().hex[:8]}"
 
         # Get tenant_id from config loader (will be used for delivery simulation)
-        from src.core.config_loader import get_current_tenant
+        from core.config_loader import get_current_tenant
 
         tenant = get_current_tenant()
         tenant_id = tenant.get("tenant_id", "unknown") if tenant else "unknown"
@@ -618,9 +618,9 @@ class MockAdServer(AdServerAdapter):
         # Generate order name using naming template
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import Tenant
-        from src.core.utils.naming import apply_naming_template, build_order_name_context
+        from core.database.database_session import get_db_session
+        from core.database.models import Tenant
+        from core.utils.naming import apply_naming_template, build_order_name_context
 
         order_name_template = "{campaign_name|brand_name} - {date_range}"  # Default
         tenant_gemini_key = None
@@ -679,7 +679,7 @@ class MockAdServer(AdServerAdapter):
 
         # Calculate total budget from packages using pricing_info if available
         # Per AdCP v2.2.0: budget is at package level
-        from src.core.schemas import extract_budget_amount
+        from core.schemas import extract_budget_amount
 
         total_budget = 0.0
         for p in packages:
@@ -931,7 +931,7 @@ class MockAdServer(AdServerAdapter):
         self, media_buy_id: str, assets: list[dict[str, Any]], today: datetime
     ) -> list[AssetStatus]:
         """Add creative assets immediately (original behavior)."""
-        from src.adapters.test_scenario_parser import has_test_keywords, parse_test_scenario
+        from adapters.test_scenario_parser import has_test_keywords, parse_test_scenario
 
         # Log operation
         self.audit_logger.log_operation(
@@ -1074,7 +1074,7 @@ class MockAdServer(AdServerAdapter):
             end_time = buy["end_time"]
 
             # Load test scenario if present (stored as dict from creation)
-            from src.adapters.test_scenario_parser import TestScenario
+            from adapters.test_scenario_parser import TestScenario
 
             test_scenario_data = buy.get("test_scenario")
             test_scenario = None
@@ -1179,7 +1179,7 @@ class MockAdServer(AdServerAdapter):
             self.log("Would retrieve delivery data from ad server")
 
         # Build per-package breakdown if packages are available
-        from src.core.schemas import AdapterPackageDelivery
+        from core.schemas import AdapterPackageDelivery
 
         by_package = []
         if media_buy_id in self._media_buys:
@@ -1253,8 +1253,8 @@ class MockAdServer(AdServerAdapter):
         from sqlalchemy import select
         from sqlalchemy.orm import attributes
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import MediaPackage
+        from core.database.database_session import get_db_session
+        from core.database.models import MediaPackage
 
         logger = logging.getLogger(__name__)
 
@@ -1296,9 +1296,9 @@ class MockAdServer(AdServerAdapter):
             # Import here to avoid circular imports
             from functools import wraps
 
-            from src.admin.utils import require_auth
-            from src.core.database.database_session import get_db_session
-            from src.core.database.models import Product
+            from admin.utils import require_auth
+            from core.database.database_session import get_db_session
+            from core.database.models import Product
 
             # Apply auth decorator manually
             @require_auth()
@@ -1349,7 +1349,7 @@ class MockAdServer(AdServerAdapter):
                         validation_errors = self.validate_product_config(new_config)
                         if validation_errors:
                             # Get formats for re-rendering
-                            from src.admin.blueprints.products import get_creative_formats
+                            from admin.blueprints.products import get_creative_formats
 
                             available_formats = get_creative_formats(tenant_id=tenant_id)
 
@@ -1368,7 +1368,7 @@ class MockAdServer(AdServerAdapter):
                         session.commit()
 
                         # Get formats for success page
-                        from src.admin.blueprints.products import get_creative_formats
+                        from admin.blueprints.products import get_creative_formats
 
                         available_formats = get_creative_formats(tenant_id=tenant_id)
 
@@ -1383,7 +1383,7 @@ class MockAdServer(AdServerAdapter):
                         )
 
                     # GET request - fetch available formats from creative agents
-                    from src.admin.blueprints.products import get_creative_formats
+                    from admin.blueprints.products import get_creative_formats
 
                     available_formats = get_creative_formats(tenant_id=tenant_id)
 
@@ -1499,7 +1499,7 @@ class MockAdServer(AdServerAdapter):
         self.log(f"🚀 Starting delivery simulation (acceleration: {time_acceleration}x, interval: {update_interval}s)")
 
         try:
-            from src.services.delivery_simulator import delivery_simulator
+            from services.delivery_simulator import delivery_simulator
 
             delivery_simulator.start_simulation(
                 media_buy_id=media_buy_id,

@@ -13,8 +13,8 @@ from datetime import UTC, datetime
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import MediaBuy, WorkflowStep
+from core.database.database_session import get_db_session
+from core.database.models import MediaBuy, WorkflowStep
 
 logger = logging.getLogger(__name__)
 
@@ -89,14 +89,14 @@ def _run_approval_polling_thread(
         )
 
         # Get GAM client manager for approval operations
-        from src.adapters.gam.client import GAMClientManager
-        from src.adapters.gam.managers.orders import GAMOrdersManager
+        from adapters.gam.client import GAMClientManager
+        from adapters.gam.managers.orders import GAMOrdersManager
 
         orders_manager = None
         try:
             with get_db_session() as db:
                 # Get adapter config for GAM
-                from src.core.database.models import AdapterConfig
+                from core.database.models import AdapterConfig
 
                 stmt = select(AdapterConfig).filter_by(tenant_id=tenant_id, adapter_type="google_ad_manager")
                 adapter_config = db.scalars(stmt).first()

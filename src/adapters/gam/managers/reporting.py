@@ -7,7 +7,7 @@ import logging
 import threading
 from datetime import UTC, datetime
 
-from src.services.webhook_delivery_service import webhook_delivery_service
+from services.webhook_delivery_service import webhook_delivery_service
 
 logger = logging.getLogger(__name__)
 

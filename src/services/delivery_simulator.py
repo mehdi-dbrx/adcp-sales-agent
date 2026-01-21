@@ -22,7 +22,7 @@ import logging
 import threading
 from datetime import datetime, timedelta
 
-from src.services.webhook_delivery_service import webhook_delivery_service
+from services.webhook_delivery_service import webhook_delivery_service
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +56,8 @@ class DeliverySimulator:
         try:
             from sqlalchemy import select
 
-            from src.core.database.database_session import get_db_session
-            from src.core.database.models import MediaBuy, Product, PushNotificationConfig, Tenant
+            from core.database.database_session import get_db_session
+            from core.database.models import MediaBuy, Product, PushNotificationConfig, Tenant
 
             logger.info("🔄 Checking for active media buys to restart simulations...")
 

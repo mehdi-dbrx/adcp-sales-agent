@@ -20,11 +20,11 @@ from typing import Any, Literal, cast
 from adcp.types.aliases import Package as ResponsePackage
 from flask import Flask
 
-from src.adapters.base import AdServerAdapter
+from adapters.base import AdServerAdapter
 
 # Import modular components
-from src.adapters.gam.client import GAMClientManager
-from src.adapters.gam.managers import (
+from adapters.gam.client import GAMClientManager
+from adapters.gam.managers import (
     GAMCreativesManager,
     GAMInventoryManager,
     GAMOrdersManager,
@@ -34,14 +34,14 @@ from src.adapters.gam.managers import (
 )
 
 # Re-export constants for backward compatibility
-from src.adapters.gam.managers.orders import (
+from adapters.gam.managers.orders import (
     GUARANTEED_LINE_ITEM_TYPES,
     NON_GUARANTEED_LINE_ITEM_TYPES,
 )
-from src.adapters.gam.pricing_compatibility import PricingCompatibility
-from src.adapters.gam_data_freshness import validate_and_log_freshness
-from src.core.audit_logger import AuditLogger
-from src.core.schemas import (
+from adapters.gam.pricing_compatibility import PricingCompatibility
+from adapters.gam_data_freshness import validate_and_log_freshness
+from core.audit_logger import AuditLogger
+from core.schemas import (
     AdapterGetMediaBuyDeliveryResponse,
     AffectedPackage,
     AssetStatus,
@@ -384,8 +384,8 @@ class GoogleAdManager(AdServerAdapter):
 
         # Get products to access implementation_config
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import GAMInventory, Product, ProductInventoryMapping
+        from core.database.database_session import get_db_session
+        from core.database.models import GAMInventory, Product, ProductInventoryMapping
 
         products_map = {}
         with get_db_session() as db_session:
@@ -577,11 +577,11 @@ class GoogleAdManager(AdServerAdapter):
         # Use naming template from adapter config, or fallback to default
         from sqlalchemy import select
 
-        from src.adapters.gam.utils.constants import GAM_NAME_LIMITS
-        from src.adapters.gam.utils.naming import truncate_name_with_suffix
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import AdapterConfig
-        from src.core.utils.naming import apply_naming_template, build_order_name_context
+        from adapters.gam.utils.constants import GAM_NAME_LIMITS
+        from adapters.gam.utils.naming import truncate_name_with_suffix
+        from core.database.database_session import get_db_session
+        from core.database.models import AdapterConfig
+        from core.utils.naming import apply_naming_template, build_order_name_context
 
         order_name_template = "{campaign_name|brand_name} - {date_range}"  # Default
         tenant_gemini_key = None
@@ -595,7 +595,7 @@ class GoogleAdManager(AdServerAdapter):
                 break  # All packages have same currency
 
         with get_db_session() as db_session:
-            from src.core.database.models import Tenant
+            from core.database.models import Tenant
 
             adapter_stmt = select(AdapterConfig).filter_by(tenant_id=self.tenant_id)
             adapter_config = db_session.scalars(adapter_stmt).first()
@@ -713,7 +713,7 @@ class GoogleAdManager(AdServerAdapter):
                     principal_id = self.principal.principal_id if hasattr(self.principal, "principal_id") else "unknown"
 
                     # Start background approval polling task
-                    from src.services.order_approval_service import start_order_approval_background
+                    from services.order_approval_service import start_order_approval_background
 
                     try:
                         approval_id = start_order_approval_background(
@@ -1036,10 +1036,10 @@ class GoogleAdManager(AdServerAdapter):
 
         from sqlalchemy import select
 
-        from src.adapters.gam_reporting_service import GAMReportingService
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import MediaBuy
-        from src.core.schemas import AdapterPackageDelivery, DeliveryTotals
+        from adapters.gam_reporting_service import GAMReportingService
+        from core.database.database_session import get_db_session
+        from core.database.models import MediaBuy
+        from core.schemas import AdapterPackageDelivery, DeliveryTotals
 
         # Input validation
         if not media_buy_id or not isinstance(media_buy_id, str):
@@ -1329,8 +1329,8 @@ class GoogleAdManager(AdServerAdapter):
             from sqlalchemy import select
             from sqlalchemy.orm import attributes
 
-            from src.core.database.database_session import get_db_session
-            from src.core.database.models import MediaPackage
+            from core.database.database_session import get_db_session
+            from core.database.models import MediaPackage
 
             # Validate budget is positive (security: prevent negative/zero budgets)
             if budget <= 0:
@@ -1349,7 +1349,7 @@ class GoogleAdManager(AdServerAdapter):
 
             with get_db_session() as session:
                 # Security: Join with MediaBuy for tenant isolation
-                from src.core.database.models import MediaBuy as MediaBuyModel
+                from core.database.models import MediaBuy as MediaBuyModel
 
                 stmt = (
                     select(MediaPackage)
@@ -1458,8 +1458,8 @@ class GoogleAdManager(AdServerAdapter):
         if action in ["pause_package", "resume_package", "pause_media_buy", "resume_media_buy"]:
             from sqlalchemy import select
 
-            from src.core.database.database_session import get_db_session
-            from src.core.database.models import MediaPackage
+            from core.database.database_session import get_db_session
+            from core.database.models import MediaPackage
 
             # Determine if we're pausing or resuming
             is_pause = action.startswith("pause_")
@@ -1481,7 +1481,7 @@ class GoogleAdManager(AdServerAdapter):
 
                 with get_db_session() as session:
                     # Security: Join with MediaBuy for tenant isolation
-                    from src.core.database.models import MediaBuy as MediaBuyModel
+                    from core.database.models import MediaBuy as MediaBuyModel
 
                     stmt = (
                         select(MediaPackage)
@@ -1558,7 +1558,7 @@ class GoogleAdManager(AdServerAdapter):
             elif action in ["pause_media_buy", "resume_media_buy"]:
                 with get_db_session() as session:
                     # Security: Join with MediaBuy for tenant isolation
-                    from src.core.database.models import MediaBuy as MediaBuyModel
+                    from core.database.models import MediaBuy as MediaBuyModel
 
                     stmt = (
                         select(MediaPackage)

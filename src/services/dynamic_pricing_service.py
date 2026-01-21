@@ -13,8 +13,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
-from src.core.database.models import FormatPerformanceMetrics
-from src.core.schemas import PriceGuidance, PricingModel, PricingOption, Product
+from core.database.models import FormatPerformanceMetrics
+from core.schemas import PriceGuidance, PricingModel, PricingOption, Product
 
 logger = logging.getLogger(__name__)
 

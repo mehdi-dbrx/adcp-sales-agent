@@ -6,10 +6,10 @@ from datetime import UTC, datetime, timedelta
 from flask import Blueprint, jsonify, request
 from sqlalchemy import func, select, text
 
-from src.admin.utils import require_auth
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import MediaBuy, Principal, Product
+from admin.utils import require_auth
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import MediaBuy, Principal, Product
 
 logger = logging.getLogger(__name__)
 
@@ -88,8 +88,8 @@ def oauth_status():
     try:
         # Check for GAM OAuth credentials using validated configuration
         try:
-            from src.core.config import get_gam_oauth_config
-            from src.core.logging_config import oauth_structured_logger
+            from core.config import get_gam_oauth_config
+            from core.logging_config import oauth_structured_logger
 
             gam_config = get_gam_oauth_config()
             client_id = gam_config.client_id
@@ -141,7 +141,7 @@ def get_tenant_products(tenant_id):
         with get_db_session() as db_session:
             from sqlalchemy import select
 
-            from src.core.database.models import Product
+            from core.database.models import Product
 
             stmt = select(Product).filter_by(tenant_id=tenant_id).order_by(Product.name)
             products = db_session.scalars(stmt).all()
@@ -169,7 +169,7 @@ def get_tenant_products(tenant_id):
 def get_product_suggestions(tenant_id):
     """API endpoint to get product suggestions based on industry and criteria."""
     try:
-        from src.services.default_products import (
+        from services.default_products import (
             get_default_products,
             get_industry_specific_products,
         )
@@ -390,8 +390,8 @@ def test_gam_connection():
                 client = ad_manager.AdManagerClient(oauth2_client, "AdCP-Sales-Agent-Setup", network_code=network_code)
 
                 # Use GoogleAdManager adapter to fetch advertisers (eliminates code duplication)
-                from src.adapters.google_ad_manager import GoogleAdManager
-                from src.core.schemas import Principal
+                from adapters.google_ad_manager import GoogleAdManager
+                from core.schemas import Principal
 
                 # Create mock principal for adapter initialization (not used for get_advertisers)
                 mock_principal = Principal(

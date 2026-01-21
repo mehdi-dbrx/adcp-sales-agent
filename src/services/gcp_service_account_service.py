@@ -56,8 +56,8 @@ from google.cloud import iam_admin_v1
 from google.cloud.iam_admin_v1 import types
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AdapterConfig
+from core.database.database_session import get_db_session
+from core.database.models import AdapterConfig
 
 logger = logging.getLogger(__name__)
 

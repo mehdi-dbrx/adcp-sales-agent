@@ -10,9 +10,9 @@ from typing import Any
 
 import requests
 
-from src.adapters.base import AdServerAdapter
-from src.core.retry_utils import api_retry
-from src.core.schemas import (
+from adapters.base import AdServerAdapter
+from core.retry_utils import api_retry
+from core.schemas import (
     AdapterGetMediaBuyDeliveryResponse,
     CreateMediaBuyRequest,
     CreateMediaBuyResponse,
@@ -295,7 +295,7 @@ class XandrAdapter(AdServerAdapter):
 
         from database_session import get_db_session
 
-        from src.core.database.models import Tenant
+        from core.database.models import Tenant
 
         task_id = f"task_{uuid.uuid4().hex[:8]}"
 
@@ -336,7 +336,7 @@ class XandrAdapter(AdServerAdapter):
             from adcp.types import PriceGuidance as AdCPPriceGuidance
             from adcp.types.generated_poc.core.publisher_property_selector import PublisherPropertySelector1
 
-            from src.core.schemas import FormatId
+            from core.schemas import FormatId
 
             # In Xandr, products map to placement groups or custom deals
             # For now, return standard IAB formats as products

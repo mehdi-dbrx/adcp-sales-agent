@@ -8,11 +8,11 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from sqlalchemy import select
 from sqlalchemy.orm import attributes
 
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Context, WorkflowStep
-from src.core.database.models import Principal as ModelPrincipal
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import Context, WorkflowStep
+from core.database.models import Principal as ModelPrincipal
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ workflows_bp = Blueprint("workflows", __name__)
 @require_tenant_access()
 def list_workflows(tenant_id, **kwargs):
     """List all workflows and pending approvals."""
-    from src.core.database.models import AuditLog, MediaBuy, Tenant
+    from core.database.models import AuditLog, MediaBuy, Tenant
 
     with get_db_session() as db:
         # Get tenant
@@ -197,7 +197,7 @@ def approve_workflow_step(tenant_id, workflow_id, step_id):
 
             # Check if this is a media buy creation workflow step
             # If so, execute the adapter creation (order/line items in GAM)
-            from src.core.database.models import MediaBuy, ObjectWorkflowMapping
+            from core.database.models import MediaBuy, ObjectWorkflowMapping
 
             stmt_mapping = select(ObjectWorkflowMapping).filter_by(step_id=step_id, object_type="media_buy")
             mapping = db.scalars(stmt_mapping).first()
@@ -224,8 +224,8 @@ def approve_workflow_step(tenant_id, workflow_id, step_id):
 
                 if media_buy and media_buy.status == "pending_approval":
                     # Check if all required creatives are approved before executing adapter creation
-                    from src.core.database.models import Creative as CreativeModel
-                    from src.core.database.models import CreativeAssignment
+                    from core.database.models import Creative as CreativeModel
+                    from core.database.models import CreativeAssignment
 
                     stmt_assignments = select(CreativeAssignment).filter_by(media_buy_id=media_buy_id)
                     assignments = db.scalars(stmt_assignments).all()
@@ -256,7 +256,7 @@ def approve_workflow_step(tenant_id, workflow_id, step_id):
                             return jsonify({"success": True}), 200
 
                     # Execute adapter creation
-                    from src.core.tools.media_buy_create import execute_approved_media_buy
+                    from core.tools.media_buy_create import execute_approved_media_buy
 
                     logger.info(f"[APPROVAL] Executing adapter creation for approved media buy {media_buy_id}")
                     success, error_msg = execute_approved_media_buy(media_buy_id, tenant_id)

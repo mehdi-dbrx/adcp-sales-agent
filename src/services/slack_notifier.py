@@ -86,7 +86,7 @@ class SlackNotifier:
             payload["blocks"] = blocks
 
         # Use webhook delivery service with retry logic
-        from src.core.webhook_delivery import WebhookDelivery, deliver_webhook_with_retry
+        from core.webhook_delivery import WebhookDelivery, deliver_webhook_with_retry
 
         # Ensure webhook_url is not None before creating delivery
         if not self.webhook_url:
@@ -435,7 +435,7 @@ class SlackNotifier:
         # Send to audit webhook with retry logic
         payload: dict[str, Any] = {"text": fallback_text, "attachments": attachments}
 
-        from src.core.webhook_delivery import WebhookDelivery, deliver_webhook_with_retry
+        from core.webhook_delivery import WebhookDelivery, deliver_webhook_with_retry
 
         # Ensure audit_webhook_url is not None before creating delivery
         if not self.audit_webhook_url:
@@ -710,7 +710,7 @@ class SlackNotifier:
             payload["blocks"] = blocks
 
         # Send message with retry logic
-        from src.core.webhook_delivery import WebhookDelivery, deliver_webhook_with_retry
+        from core.webhook_delivery import WebhookDelivery, deliver_webhook_with_retry
 
         # Ensure webhook_url is not None before creating delivery
         if not self.webhook_url:

@@ -183,7 +183,7 @@ class AdCPBaseModel(BaseModel):
 
     def __init__(self, **data):
         """Initialize model with environment-aware validation."""
-        from src.core.config import is_production
+        from core.config import is_production
 
         # Check if child class overrides extra handling
         child_model_config = getattr(self.__class__, "model_config", {})
@@ -777,7 +777,7 @@ def get_format_by_id(format_id: str, tenant_id: str | None = None) -> Format | N
     Returns:
         Format object or None if not found
     """
-    from src.core.format_resolver import get_format
+    from core.format_resolver import get_format
 
     try:
         return get_format(format_id, tenant_id=tenant_id)
@@ -1205,7 +1205,7 @@ class Product(LibraryProduct):
         for fmt in format_ids:
             if isinstance(fmt, str):
                 # Legacy string format - convert to FormatId object
-                from src.core.format_cache import upgrade_legacy_format_id
+                from core.format_cache import upgrade_legacy_format_id
 
                 try:
                     result.append(upgrade_legacy_format_id(fmt))
@@ -1221,7 +1221,7 @@ class Product(LibraryProduct):
                     result.append(FormatId(agent_url=url(fmt["agent_url"]), id=fmt["id"]))
                 elif "id" in fmt:
                     # Missing agent_url - try upgrade, fallback to default
-                    from src.core.format_cache import upgrade_legacy_format_id
+                    from core.format_cache import upgrade_legacy_format_id
 
                     try:
                         result.append(upgrade_legacy_format_id(fmt["id"]))
@@ -1234,7 +1234,7 @@ class Product(LibraryProduct):
                 if hasattr(fmt, "agent_url") and hasattr(fmt, "id"):
                     result.append(FormatId(agent_url=url(str(fmt.agent_url)), id=fmt.id))
                 elif hasattr(fmt, "format_id"):
-                    from src.core.format_cache import upgrade_legacy_format_id
+                    from core.format_cache import upgrade_legacy_format_id
 
                     try:
                         result.append(upgrade_legacy_format_id(fmt.format_id))
@@ -1477,7 +1477,7 @@ class GetProductsResponse(NestedModelSerializerMixin, LibraryGetProductsResponse
 
         # Check if this looks like an anonymous response (all pricing options have no rates)
         # Import here to avoid circular import (schemas -> helpers -> auth -> schemas)
-        from src.core.helpers.pricing_helpers import pricing_option_has_rate
+        from core.helpers.pricing_helpers import pricing_option_has_rate
 
         if count > 0 and all(
             all(not pricing_option_has_rate(po) for po in p.pricing_options) for p in self.products if p.pricing_options
@@ -1649,7 +1649,7 @@ class Creative(LibraryCreative):
     @classmethod
     def validate_format_id(cls, values):
         """Validate and upgrade format_id to AdCP namespaced format."""
-        from src.core.format_cache import upgrade_legacy_format_id
+        from core.format_cache import upgrade_legacy_format_id
 
         # Handle both 'format' and 'format_id' keys
         format_val = values.get("format_id") or values.get("format")

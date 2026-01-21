@@ -19,8 +19,8 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any
 
-from src.adapters.gam.client import GAMClientManager
-from src.adapters.gam_inventory_discovery import (
+from adapters.gam.client import GAMClientManager
+from adapters.gam_inventory_discovery import (
     AdUnit,
     AudienceSegment,
     GAMInventoryDiscovery,

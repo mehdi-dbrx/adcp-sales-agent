@@ -10,22 +10,22 @@ from typing import TYPE_CHECKING, Any, Union
 from fastmcp.server.context import Context
 
 if TYPE_CHECKING:
-    from src.core.tool_context import ToolContext
+    from core.tool_context import ToolContext
 from fastmcp.server.dependencies import get_http_headers
 from rich.console import Console
 from sqlalchemy import select
 
-from src.core.config_loader import (
+from core.config_loader import (
     get_current_tenant,
     get_tenant_by_id,
     get_tenant_by_subdomain,
     get_tenant_by_virtual_host,
     set_current_tenant,
 )
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Principal as ModelPrincipal
-from src.core.database.models import Tenant
-from src.core.schemas import Principal
+from core.database.database_session import get_db_session
+from core.database.models import Principal as ModelPrincipal
+from core.database.models import Tenant
+from core.schemas import Principal
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -95,7 +95,7 @@ def get_principal_from_token(token: str, tenant_id: str | None = None) -> str | 
                 tenant_ctx_stmt = select(Tenant).filter_by(tenant_id=principal.tenant_id, is_active=True)
                 tenant = session.scalars(tenant_ctx_stmt).first()
                 if tenant:
-                    from src.core.utils.tenant_utils import serialize_tenant_to_dict
+                    from core.utils.tenant_utils import serialize_tenant_to_dict
 
                     tenant_dict = serialize_tenant_to_dict(tenant)
                     set_current_tenant(tenant_dict)
@@ -178,7 +178,7 @@ def get_principal_from_context(
     The caller MUST call set_current_tenant(tenant_context) in their own context.
     """
     # Import here to avoid circular dependency
-    from src.core.tool_context import ToolContext
+    from core.tool_context import ToolContext
 
     # Handle ToolContext directly (already has principal_id and tenant_id)
     if isinstance(context, ToolContext):

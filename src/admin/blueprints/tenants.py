@@ -15,15 +15,15 @@ from babel import numbers as babel_numbers
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import func, select
 
-from src.admin.services import DashboardService
-from src.admin.utils import get_tenant_config_from_db, require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.config_loader import is_single_tenant_mode
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Principal, Tenant
-from src.core.domain_config import get_sales_agent_domain
-from src.core.validation import sanitize_form_data, validate_form_data
-from src.services.setup_checklist_service import SetupChecklistService
+from admin.services import DashboardService
+from admin.utils import get_tenant_config_from_db, require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.config_loader import is_single_tenant_mode
+from core.database.database_session import get_db_session
+from core.database.models import Principal, Tenant
+from core.domain_config import get_sales_agent_domain
+from core.validation import sanitize_form_data, validate_form_data
+from services.setup_checklist_service import SetupChecklistService
 
 logger = logging.getLogger(__name__)
 
@@ -222,7 +222,7 @@ def tenant_settings(tenant_id, section=None):
             )
 
             # Get advertiser data for the advertisers section
-            from src.core.database.models import GAMInventory, Principal
+            from core.database.models import GAMInventory, Principal
 
             stmt = select(Principal).filter_by(tenant_id=tenant_id)
             principals = db_session.scalars(stmt).all()
@@ -230,7 +230,7 @@ def tenant_settings(tenant_id, section=None):
             active_advertisers = len(principals)  # For now, assume all are active
 
             # Check for running sync jobs
-            from src.core.database.models import SyncJob
+            from core.database.models import SyncJob
 
             running_sync = None
             if active_adapter == "google_ad_manager":
@@ -294,7 +294,7 @@ def tenant_settings(tenant_id, section=None):
             authorized_emails = tenant.authorized_emails or []
 
             # Get product counts
-            from src.core.database.models import Product
+            from core.database.models import Product
 
             stmt = select(Product).filter_by(tenant_id=tenant_id)
             products = db_session.scalars(stmt).all()
@@ -308,7 +308,7 @@ def tenant_settings(tenant_id, section=None):
             # Template section also removed - no longer passed to template
 
             # Get inventory counts
-            from src.core.database.models import GAMInventory
+            from core.database.models import GAMInventory
 
             try:
                 stmt = select(func.count()).select_from(GAMInventory).filter_by(tenant_id=tenant_id)
@@ -357,7 +357,7 @@ def tenant_settings(tenant_id, section=None):
             a2a_port = int(os.environ.get("A2A_PORT", 8091)) if not is_production else None
 
             # Get currency limits for this tenant
-            from src.core.database.models import CurrencyLimit
+            from core.database.models import CurrencyLimit
 
             stmt = select(CurrencyLimit).filter_by(tenant_id=tenant_id).order_by(CurrencyLimit.currency_code)
             currency_limits = db_session.scalars(stmt).all()
@@ -475,7 +475,7 @@ def update(tenant_id):
 def update_slack(tenant_id):
     """Update tenant Slack settings."""
     try:
-        from src.core.webhook_validator import WebhookURLValidator
+        from core.webhook_validator import WebhookURLValidator
 
         # Sanitize form data
         form_data = sanitize_form_data(request.form.to_dict())
@@ -604,7 +604,7 @@ def deactivate_tenant(tenant_id):
             logger.info(f"Tenant {tenant_id} ({tenant.name}) deactivated by user {session.get('user', 'unknown')}")
 
             # Create audit log entry for compliance
-            from src.core.audit_logger import AuditLogger
+            from core.audit_logger import AuditLogger
 
             try:
                 audit_logger = AuditLogger(tenant_id)
@@ -641,8 +641,8 @@ def deactivate_tenant(tenant_id):
 @require_tenant_access()
 def media_buys_list(tenant_id):
     """List media buys with optional status filter."""
-    from src.admin.services.media_buy_readiness_service import MediaBuyReadinessService
-    from src.core.database.models import MediaBuy, Product
+    from admin.services.media_buy_readiness_service import MediaBuyReadinessService
+    from core.database.models import MediaBuy, Product
 
     try:
         # Get status filter from query params

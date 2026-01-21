@@ -16,7 +16,7 @@ from sqlalchemy import create_engine, event, select
 from sqlalchemy.exc import DisconnectionError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
-from src.core.database.db_config import DatabaseConfig
+from core.database.db_config import DatabaseConfig
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,7 @@ def get_engine():
             logger.info("PgBouncer detected - using optimized connection pool settings")
             # PgBouncer-optimized settings:
             # - Smaller pool_size (PgBouncer handles pooling)
-            # - No pool_pre_ping (can cause issues with transaction pooling)
+            # - No pool_pre_ping (PgBouncer doesn't support transaction pooling)
             # - Shorter pool_recycle (PgBouncer recycles for us)
             # - statement_timeout set via event listener (PgBouncer doesn't support startup parameters)
             _engine = create_engine(

@@ -19,7 +19,7 @@ from adcp import (
 
 # Import our extended Product (includes implementation_config)
 # Not the library Product - we need the internal fields
-from src.core.schemas import Product
+from core.schemas import Product
 
 
 def convert_pricing_option_to_adcp(

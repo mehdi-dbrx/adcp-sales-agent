@@ -16,13 +16,19 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ script_name }}/static/validation.css">
+    <!-- Modern UI Enhancements - Comment out to revert -->
+    <link rel="stylesheet" href="{{ script_name }}/static/modern.css">
     <style>
         /* Custom styles that don't conflict with Bootstrap */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background: #f5f5f5;
             color: #333;
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         /* Use Bootstrap's container instead */
         .header {
@@ -32,10 +38,30 @@
             margin-bottom: 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .tf1-logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
         .header h1 { margin: 0; }
         .header nav { margin-top: 0.5rem; }
         .header a { color: #ecf0f1; text-decoration: none; margin-right: 1rem; }
         .header a:hover { color: #3498db; }
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .tf1-logo {
+                height: 30px;
+            }
+        }
         /* Use Bootstrap's card component instead */
         .custom-card {
             background: white;
@@ -144,20 +170,21 @@
 <body>
     {% if g.test_mode %}
     <div style="background: #ff9800; color: white; padding: 0.75rem 1rem; text-align: center; font-weight: bold; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;">
-        ⚠️ TEST MODE ACTIVE - Authentication bypassed for testing. DO NOT USE IN PRODUCTION!
+        <i class="fas fa-exclamation-triangle"></i> TEST MODE ACTIVE - Authentication bypassed for testing. DO NOT USE IN PRODUCTION!
     </div>
     <div style="height: 50px;"></div>
     {% endif %}
 
     <div class="header">
         <div class="container">
-            <h1>
-                {% if tenant and tenant.name and session.role != 'super_admin' %}
-                    {{ tenant.name }} Sales Agent Dashboard
-                {% else %}
-                    Sales Agent Admin
-                {% endif %}
-            </h1>
+            <div class="header-content">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/TF1_1989-1990.png" 
+                     alt="TF1 Logo" 
+                     class="tf1-logo">
+                <h1>
+                    Sales Agent Dashboard
+                </h1>
+            </div>
             <nav>
                 {% if session.authenticated %}
                     <span style="color: #ecf0f1; margin-right: 1rem;">

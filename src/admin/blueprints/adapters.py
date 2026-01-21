@@ -6,10 +6,10 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from sqlalchemy import select
 from sqlalchemy.orm import attributes
 
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Product
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import Product
 
 logger = logging.getLogger(__name__)
 

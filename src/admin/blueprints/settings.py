@@ -16,10 +16,10 @@ from babel import numbers as babel_numbers
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from sqlalchemy import select
 
-from src.admin.utils import require_auth, require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant
+from admin.utils import require_auth, require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -200,7 +200,7 @@ def update_general(tenant_id):
             # Update currency limits
             from decimal import Decimal, InvalidOperation
 
-            from src.core.database.models import CurrencyLimit
+            from core.database.models import CurrencyLimit
 
             # Get all existing currency limits
             stmt = select(CurrencyLimit).filter_by(tenant_id=tenant_id)
@@ -333,7 +333,7 @@ def update_adapter(tenant_id):
                 adapter_config_obj.adapter_type = new_adapter
             else:
                 # Create new config
-                from src.core.database.models import AdapterConfig
+                from core.database.models import AdapterConfig
 
                 adapter_config_obj = AdapterConfig(tenant_id=tenant_id, adapter_type=new_adapter)
                 db_session.add(adapter_config_obj)
@@ -484,7 +484,7 @@ def update_adapter(tenant_id):
 def update_slack(tenant_id):
     """Update Slack integration settings."""
     try:
-        from src.core.webhook_validator import WebhookURLValidator
+        from core.webhook_validator import WebhookURLValidator
 
         webhook_url = request.form.get("slack_webhook_url", "").strip()
         audit_webhook_url = request.form.get("slack_audit_webhook_url", "").strip()
@@ -603,7 +603,7 @@ def test_ai_connection(tenant_id):
     from pydantic import BaseModel
     from pydantic_ai import Agent
 
-    from src.services.ai import AIServiceFactory
+    from services.ai import AIServiceFactory
 
     try:
         data = request.get_json() or {}
@@ -819,7 +819,7 @@ def get_ai_models(tenant_id):
 @require_tenant_access()
 def add_authorized_domain(tenant_id):
     """Add domain to tenant's authorized domains list."""
-    from src.admin.domain_access import add_authorized_domain as add_domain
+    from admin.domain_access import add_authorized_domain as add_domain
 
     try:
         domain = request.form.get("domain", "").strip().lower()
@@ -850,7 +850,7 @@ def add_authorized_domain(tenant_id):
 @require_tenant_access()
 def remove_authorized_domain(tenant_id):
     """Remove domain from tenant's authorized domains list."""
-    from src.admin.domain_access import remove_authorized_domain as remove_domain
+    from admin.domain_access import remove_authorized_domain as remove_domain
 
     try:
         domain = request.form.get("domain", "").strip().lower()
@@ -876,7 +876,7 @@ def remove_authorized_domain(tenant_id):
 @require_tenant_access()
 def add_authorized_email(tenant_id):
     """Add email to tenant's authorized emails list."""
-    from src.admin.domain_access import add_authorized_email as add_email
+    from admin.domain_access import add_authorized_email as add_email
 
     try:
         email = request.form.get("email", "").strip().lower()
@@ -907,7 +907,7 @@ def add_authorized_email(tenant_id):
 @require_tenant_access()
 def remove_authorized_email(tenant_id):
     """Remove email from tenant's authorized emails list."""
-    from src.admin.domain_access import remove_authorized_email as remove_email
+    from admin.domain_access import remove_authorized_email as remove_email
 
     try:
         email = request.form.get("email", "").strip().lower()
@@ -934,7 +934,7 @@ def remove_authorized_email(tenant_id):
 @require_tenant_access()
 def test_domain_access(tenant_id):
     """Test email access for this tenant."""
-    from src.admin.domain_access import get_user_tenant_access
+    from admin.domain_access import get_user_tenant_access
 
     try:
         test_email = request.form.get("test_email", "").strip().lower()
@@ -983,7 +983,7 @@ def parse_form_data_to_policy_updates(form_data) -> dict[str, Any]:
     """
     from decimal import Decimal
 
-    from src.services.policy_service import CurrencyLimitData
+    from services.policy_service import CurrencyLimitData
 
     updates: dict[str, Any] = {}
 
@@ -1174,7 +1174,7 @@ def update_business_rules(tenant_id):
     This function uses PolicyService for validation and updates. The service layer
     provides clean, testable business logic with comprehensive validation.
     """
-    from src.services.policy_service import PolicyService, ValidationError
+    from services.policy_service import PolicyService, ValidationError
 
     try:
         # Get form data

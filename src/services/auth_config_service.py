@@ -9,9 +9,9 @@ from datetime import UTC, datetime
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant, TenantAuthConfig
-from src.core.domain_config import get_sales_agent_domain, get_sales_agent_url
+from core.database.database_session import get_db_session
+from core.database.models import Tenant, TenantAuthConfig
+from core.domain_config import get_sales_agent_domain, get_sales_agent_url
 
 logger = logging.getLogger(__name__)
 

@@ -6,8 +6,8 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from src.services.ai import AIServiceFactory, TenantAIConfig
-from src.services.ai.agents.policy_agent import (
+from services.ai import AIServiceFactory, TenantAIConfig
+from services.ai.agents.policy_agent import (
     check_policy_compliance,
     create_policy_agent,
 )

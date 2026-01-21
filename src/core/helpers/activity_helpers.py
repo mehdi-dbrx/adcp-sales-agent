@@ -6,12 +6,12 @@ import time
 from fastmcp.server.context import Context
 from sqlalchemy import select
 
-from src.core.auth import get_principal_from_context
-from src.core.config_loader import get_current_tenant, set_current_tenant
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Principal as ModelPrincipal
-from src.core.tool_context import ToolContext
-from src.services.activity_feed import activity_feed
+from core.auth import get_principal_from_context
+from core.config_loader import get_current_tenant, set_current_tenant
+from core.database.database_session import get_db_session
+from core.database.models import Principal as ModelPrincipal
+from core.tool_context import ToolContext
+from services.activity_feed import activity_feed
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,7 @@ def log_tool_activity(context: Context | ToolContext, tool_name: str, start_time
         # Also log to audit logs (for persistent dashboard activity feed)
         from typing import Any
 
-        from src.core.audit_logger import get_audit_logger
+        from core.audit_logger import get_audit_logger
 
         audit_logger = get_audit_logger("MCP", tenant["tenant_id"])
         details: dict[str, Any] = {"tool": tool_name, "status": "success"}

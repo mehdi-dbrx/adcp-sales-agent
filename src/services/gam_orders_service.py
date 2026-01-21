@@ -15,9 +15,9 @@ from typing import Any, cast
 from sqlalchemy import create_engine, or_, select
 from sqlalchemy.orm import Session, joinedload, scoped_session, sessionmaker
 
-from src.adapters.gam_orders_discovery import GAMOrdersDiscovery, LineItem, Order
-from src.core.database.db_config import DatabaseConfig
-from src.core.database.models import GAMLineItem, GAMOrder
+from adapters.gam_orders_discovery import GAMOrdersDiscovery, LineItem, Order
+from core.database.db_config import DatabaseConfig
+from core.database.models import GAMLineItem, GAMOrder
 
 # Create database session factory
 engine = create_engine(DatabaseConfig.get_connection_string())

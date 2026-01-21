@@ -16,9 +16,9 @@ from typing import Any
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
-from src.adapters.gam_reporting_service import GAMReportingService
-from src.core.database.database_session import get_db_session
-from src.core.database.models import FormatPerformanceMetrics, Tenant
+from adapters.gam_reporting_service import GAMReportingService
+from core.database.database_session import get_db_session
+from core.database.models import FormatPerformanceMetrics, Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -268,9 +268,9 @@ def aggregate_all_tenants(period_days: int = 30) -> dict[str, Any]:
     Returns:
         Summary of aggregation across all tenants
     """
-    from src.adapters.gam.auth import GAMAuthManager
-    from src.adapters.gam.client import GAMClientManager
-    from src.core.database.models import AdapterConfig
+    from adapters.gam.auth import GAMAuthManager
+    from adapters.gam.client import GAMClientManager
+    from core.database.models import AdapterConfig
 
     logger.info("Starting format metrics aggregation for all tenants")
 

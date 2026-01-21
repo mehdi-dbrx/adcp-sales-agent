@@ -100,8 +100,8 @@ class GAMTargetingManager:
         """
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import AdapterConfig
+        from core.database.database_session import get_db_session
+        from core.database.models import AdapterConfig
 
         try:
             with get_db_session() as session:
@@ -132,8 +132,8 @@ class GAMTargetingManager:
         """
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import AdapterConfig
+        from core.database.database_session import get_db_session
+        from core.database.models import AdapterConfig
 
         try:
             with get_db_session() as session:
@@ -175,8 +175,8 @@ class GAMTargetingManager:
 
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import AdapterConfig
+        from core.database.database_session import get_db_session
+        from core.database.models import AdapterConfig
 
         try:
             # Fetch all custom targeting keys from GAM

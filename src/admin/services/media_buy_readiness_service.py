@@ -17,8 +17,8 @@ from typing import TypedDict, cast
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Creative, CreativeAssignment, GAMLineItem, GAMOrder, MediaBuy, Tenant
+from core.database.database_session import get_db_session
+from core.database.models import Creative, CreativeAssignment, GAMLineItem, GAMOrder, MediaBuy, Tenant
 
 logger = logging.getLogger(__name__)
 

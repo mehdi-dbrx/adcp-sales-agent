@@ -29,29 +29,29 @@ from pydantic import ValidationError
 from rich.console import Console
 from sqlalchemy import select
 
-from src.core.tool_context import ToolContext
+from core.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 console = Console()
 
-from src.core.audit_logger import get_audit_logger
-from src.core.config_loader import get_current_tenant
-from src.core.database.database_session import get_db_session
-from src.core.helpers import (
+from core.audit_logger import get_audit_logger
+from core.config_loader import get_current_tenant
+from core.database.database_session import get_db_session
+from core.helpers import (
     _extract_format_info,
     _validate_creative_assets,
     get_principal_id_from_context,
     log_tool_activity,
 )
-from src.core.schema_helpers import to_context_object
-from src.core.schemas import (
+from core.schema_helpers import to_context_object
+from core.schemas import (
     Creative,
     CreativeStatusEnum,
     ListCreativesResponse,
     SyncCreativeResult,
     SyncCreativesResponse,
 )
-from src.core.validation_helpers import format_validation_error, run_async_in_sync_context
+from core.validation_helpers import format_validation_error, run_async_in_sync_context
 
 
 def _sync_creatives_impl(
@@ -120,7 +120,7 @@ def _sync_creatives_impl(
 
     # Get tenant information
     # If context is ToolContext (A2A), tenant is already set, but verify it matches
-    from src.core.tool_context import ToolContext
+    from core.tool_context import ToolContext
 
     if isinstance(ctx, ToolContext):
         # Tenant context should already be set by A2A handler, but verify
@@ -167,7 +167,7 @@ def _sync_creatives_impl(
 
     # Fetch creative formats ONCE before processing loop (outside any transaction)
     # This avoids async HTTP calls inside database savepoints which cause transaction errors
-    from src.core.creative_agent_registry import get_creative_agent_registry
+    from core.creative_agent_registry import get_creative_agent_registry
 
     registry = get_creative_agent_registry()
     all_formats = run_async_in_sync_context(registry.list_all_formats(tenant_id=tenant["tenant_id"]))
@@ -282,7 +282,7 @@ def _sync_creatives_impl(
                     # SECURITY: Must filter by principal_id to prevent cross-principal modification
                     existing_creative = None
                     if creative.get("creative_id"):
-                        from src.core.database.models import Creative as DBCreative
+                        from core.database.models import Creative as DBCreative
 
                         # Query for existing creative with security filter
                         stmt = select(DBCreative).filter_by(
@@ -332,7 +332,7 @@ def _sync_creatives_impl(
                             elif approval_mode == "ai-powered":
                                 # Submit to background AI review (async)
 
-                                from src.admin.blueprints.creatives import (
+                                from admin.blueprints.creatives import (
                                     _ai_review_executor,
                                     _ai_review_lock,
                                     _ai_review_tasks,
@@ -349,7 +349,7 @@ def _sync_creatives_impl(
                                 session.flush()
 
                                 # Import the async function
-                                from src.admin.blueprints.creatives import _ai_review_creative_async
+                                from admin.blueprints.creatives import _ai_review_creative_async
 
                                 future = _ai_review_executor.submit(
                                     _ai_review_creative_async,
@@ -444,7 +444,7 @@ def _sync_creatives_impl(
                                         )
 
                                         # Get Gemini API key from config
-                                        from src.core.config import get_config
+                                        from core.config import get_config
 
                                         config = get_config()
                                         gemini_api_key = config.gemini_api_key
@@ -781,7 +781,7 @@ def _sync_creatives_impl(
 
                     else:
                         # Create new creative
-                        from src.core.database.models import Creative as DBCreative
+                        from core.database.models import Creative as DBCreative
 
                         # Extract creative_id for error reporting (must be defined before any validation)
                         creative_id = creative.get("creative_id", "unknown")
@@ -859,7 +859,7 @@ def _sync_creatives_impl(
                                         )
 
                                         # Get Gemini API key from config
-                                        from src.core.config import get_config
+                                        from core.config import get_config
 
                                         config = get_config()
                                         gemini_api_key = config.gemini_api_key
@@ -1165,7 +1165,7 @@ def _sync_creatives_impl(
                         elif approval_mode == "ai-powered":
                             # Submit to background AI review (async)
 
-                            from src.admin.blueprints.creatives import (
+                            from admin.blueprints.creatives import (
                                 _ai_review_executor,
                                 _ai_review_lock,
                                 _ai_review_tasks,
@@ -1179,7 +1179,7 @@ def _sync_creatives_impl(
                             task_id = f"ai_review_{db_creative.creative_id}_{uuid.uuid4().hex[:8]}"
 
                             # Import the async function
-                            from src.admin.blueprints.creatives import _ai_review_creative_async
+                            from admin.blueprints.creatives import _ai_review_creative_async
 
                             future = _ai_review_executor.submit(
                                 _ai_review_creative_async,
@@ -1266,9 +1266,9 @@ def _sync_creatives_impl(
     # Note: assignments should be a dict, but handle both dict and None
     if assignments and isinstance(assignments, dict):
         with get_db_session() as session:
-            from src.core.database.models import CreativeAssignment as DBAssignment
-            from src.core.database.models import MediaBuy, MediaPackage
-            from src.core.schemas import CreativeAssignment
+            from core.database.models import CreativeAssignment as DBAssignment
+            from core.database.models import MediaBuy, MediaPackage
+            from core.schemas import CreativeAssignment
 
             for creative_id, package_ids in assignments.items():
                 # Initialize tracking for this creative
@@ -1311,8 +1311,8 @@ def _sync_creatives_impl(
 
                     # Validate creative format against package product formats
                     # Get creative format
-                    from src.core.database.models import Creative as DBCreative
-                    from src.core.database.models import Product
+                    from core.database.models import Creative as DBCreative
+                    from core.database.models import Product
 
                     creative_stmt = select(DBCreative).where(
                         DBCreative.tenant_id == tenant["tenant_id"], DBCreative.creative_id == creative_id
@@ -1465,8 +1465,8 @@ def _sync_creatives_impl(
 
     # Create workflow steps for creatives requiring approval
     if creatives_needing_approval:
-        from src.core.context_manager import get_context_manager
-        from src.core.database.models import ObjectWorkflowMapping
+        from core.context_manager import get_context_manager
+        from core.database.models import ObjectWorkflowMapping
 
         ctx_manager = get_context_manager()
 
@@ -1547,7 +1547,7 @@ def _sync_creatives_impl(
             f"Checking Slack notification: creatives={len(creatives_needing_approval)}, webhook={tenant.get('slack_webhook_url')}, approval_mode={approval_mode}"
         )
         if creatives_needing_approval and tenant.get("slack_webhook_url") and approval_mode == "require-human":
-            from src.services.slack_notifier import get_slack_notifier
+            from services.slack_notifier import get_slack_notifier
 
             logger.info(
                 f"Sending Slack notifications for {len(creatives_needing_approval)} creatives (require-human mode)"
@@ -1646,7 +1646,7 @@ def _sync_creatives_impl(
     # Log audit trail for sync_creatives operation
     try:
         with get_db_session() as audit_session:
-            from src.core.database.models import Principal as DBPrincipal
+            from core.database.models import Principal as DBPrincipal
 
             # Get principal info for audit log
             principal_stmt = select(DBPrincipal).filter_by(tenant_id=tenant["tenant_id"], principal_id=principal_id)
@@ -1799,7 +1799,7 @@ def _list_creatives_impl(
     from adcp.types import Pagination as LibraryPagination
     from adcp.types import Sort as LibrarySort
 
-    from src.core.schemas import ListCreativesRequest
+    from core.schemas import ListCreativesRequest
 
     # Parse datetime strings if provided
     created_after_dt = None
@@ -1908,9 +1908,9 @@ def _list_creatives_impl(
     total_count = 0
 
     with get_db_session() as session:
-        from src.core.database.models import Creative as DBCreative
-        from src.core.database.models import CreativeAssignment as DBAssignment
-        from src.core.database.models import MediaBuy
+        from core.database.models import Creative as DBCreative
+        from core.database.models import CreativeAssignment as DBAssignment
+        from core.database.models import MediaBuy
 
         # Build query - filter by tenant AND principal for security
         stmt = select(DBCreative).filter_by(tenant_id=tenant["tenant_id"], principal_id=principal_id)
@@ -2001,7 +2001,7 @@ def _list_creatives_impl(
                 )
 
             # Build Creative directly with explicit types to satisfy mypy
-            from src.core.schemas import FormatId, url
+            from core.schemas import FormatId, url
 
             # Build FormatId with optional parameters (AdCP 2.5 format templates)
             format_kwargs: dict[str, Any] = {
@@ -2042,7 +2042,7 @@ def _list_creatives_impl(
                 continue
 
             # Convert string status to CreativeStatus enum
-            from src.core.schemas import CreativeStatus
+            from core.schemas import CreativeStatus
 
             try:
                 status_enum = CreativeStatus(db_creative.status)
@@ -2123,7 +2123,7 @@ def _list_creatives_impl(
     offset_calc = (page - 1) * limit
 
     # Import required schema classes
-    from src.core.schemas import Pagination, QuerySummary
+    from core.schemas import Pagination, QuerySummary
 
     # Convert ContextObject to dict for response
     context_dict = req.context.model_dump() if req.context and hasattr(req.context, "model_dump") else None

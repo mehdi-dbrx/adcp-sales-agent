@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Any, Literal
 
-from src.adapters.creative_engine import CreativeEngineAdapter
-from src.core.schemas import Creative, CreativeAdaptation, CreativeApprovalStatus, FormatId
+from adapters.creative_engine import CreativeEngineAdapter
+from core.schemas import Creative, CreativeAdaptation, CreativeApprovalStatus, FormatId
 
 
 class MockCreativeEngine(CreativeEngineAdapter):

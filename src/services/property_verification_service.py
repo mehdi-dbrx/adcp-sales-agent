@@ -17,8 +17,8 @@ from adcp import (
 )
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AuthorizedProperty
+from core.database.database_session import get_db_session
+from core.database.models import AuthorizedProperty
 
 logger = logging.getLogger(__name__)
 

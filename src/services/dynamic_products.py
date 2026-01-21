@@ -18,9 +18,9 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import attributes
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Product
-from src.core.signals_agent_registry import get_signals_agent_registry
+from core.database.database_session import get_db_session
+from core.database.models import Product
+from core.signals_agent_registry import get_signals_agent_registry
 
 logger = logging.getLogger(__name__)
 

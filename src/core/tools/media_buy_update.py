@@ -23,28 +23,28 @@ from fastmcp.tools.tool import ToolResult
 from pydantic import ValidationError
 from sqlalchemy import select
 
-from src.core.tool_context import ToolContext
+from core.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 
-from src.core.audit_logger import get_audit_logger
-from src.core.auth import (
+from core.audit_logger import get_audit_logger
+from core.auth import (
     get_principal_object,
 )
-from src.core.config_loader import get_current_tenant
-from src.core.context_manager import get_context_manager
-from src.core.database.database_session import get_db_session
-from src.core.helpers import get_principal_id_from_context
-from src.core.helpers.adapter_helpers import get_adapter
-from src.core.schema_helpers import to_context_object
-from src.core.schemas import (
+from core.config_loader import get_current_tenant
+from core.context_manager import get_context_manager
+from core.database.database_session import get_db_session
+from core.helpers import get_principal_id_from_context
+from core.helpers.adapter_helpers import get_adapter
+from core.schema_helpers import to_context_object
+from core.schemas import (
     AffectedPackage,
     UpdateMediaBuyError,
     UpdateMediaBuyRequest,
     UpdateMediaBuySuccess,
 )
-from src.core.testing_hooks import get_testing_context
-from src.core.validation_helpers import format_validation_error
+from core.testing_hooks import get_testing_context
+from core.validation_helpers import format_validation_error
 
 
 def _verify_principal(media_buy_id: str, context: Context | ToolContext):
@@ -61,7 +61,7 @@ def _verify_principal(media_buy_id: str, context: Context | ToolContext):
         PermissionError: Principal doesn't own media buy
     """
 
-    from src.core.database.models import MediaBuy as MediaBuyModel
+    from core.database.models import MediaBuy as MediaBuyModel
 
     # Get principal_id from context
     if isinstance(context, ToolContext):
@@ -168,7 +168,7 @@ def _update_media_buy_impl(
     if budget is not None:
         from typing import Literal
 
-        from src.core.schemas import Budget
+        from core.schemas import Budget
 
         pacing_val: Literal["even", "asap", "daily_budget"] = "even"
         if pacing == "even":
@@ -233,8 +233,8 @@ def _update_media_buy_impl(
     media_buy_id_to_use = req.media_buy_id
     if not media_buy_id_to_use and req.buyer_ref:
         # Look up media_buy_id by buyer_ref (tenant context already set above)
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import MediaBuy as MediaBuyModel
+        from core.database.database_session import get_db_session
+        from core.database.models import MediaBuy as MediaBuyModel
 
         with get_db_session() as session:
             stmt = select(MediaBuyModel).where(
@@ -339,9 +339,9 @@ def _update_media_buy_impl(
     if req.start_time or req.end_time or req.budget or (req.packages and any(pkg.budget for pkg in req.packages)):
         from decimal import Decimal
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import CurrencyLimit
-        from src.core.database.models import MediaBuy as MediaBuyModel
+        from core.database.database_session import get_db_session
+        from core.database.models import CurrencyLimit
+        from core.database.models import MediaBuy as MediaBuyModel
 
         # Get media buy from database to check currency and current dates
         with get_db_session() as session:
@@ -587,10 +587,10 @@ def _update_media_buy_impl(
                     )
                     return response_data
 
-                from src.core.database.database_session import get_db_session
-                from src.core.database.models import Creative as DBCreative
-                from src.core.database.models import CreativeAssignment as DBAssignment
-                from src.core.database.models import MediaBuy as MediaBuyModel
+                from core.database.database_session import get_db_session
+                from core.database.models import Creative as DBCreative
+                from core.database.models import CreativeAssignment as DBAssignment
+                from core.database.models import MediaBuy as MediaBuyModel
 
                 with get_db_session() as session:
                     # Resolve media_buy_id (might be buyer_ref)
@@ -660,8 +660,8 @@ def _update_media_buy_impl(
 
                     # Validate creative formats against package product formats
                     # Get package and product to check supported formats
-                    from src.core.database.models import MediaPackage as MediaPackageModel
-                    from src.core.database.models import Product
+                    from core.database.models import MediaPackage as MediaPackageModel
+                    from core.database.models import Product
 
                     package_stmt = select(MediaPackageModel).where(
                         MediaPackageModel.package_id == pkg_update.package_id,
@@ -823,7 +823,7 @@ def _update_media_buy_impl(
                     )
                     return response_data
 
-                from src.core.tools.creatives import _sync_creatives_impl
+                from core.tools.creatives import _sync_creatives_impl
 
                 # Sync creatives (upload/update)
                 creative_dicts: list[dict[str, Any]] = []
@@ -888,11 +888,11 @@ def _update_media_buy_impl(
                     )
                     return response_data
 
-                from src.core.database.database_session import get_db_session
-                from src.core.database.models import CreativeAssignment as DBAssignment
-                from src.core.database.models import MediaBuy as MediaBuyModel
-                from src.core.database.models import MediaPackage as MediaPackageModel
-                from src.core.database.models import Product as ProductModel
+                from core.database.database_session import get_db_session
+                from core.database.models import CreativeAssignment as DBAssignment
+                from core.database.models import MediaBuy as MediaBuyModel
+                from core.database.models import MediaPackage as MediaPackageModel
+                from core.database.models import Product as ProductModel
 
                 with get_db_session() as session:
                     # Resolve media_buy_id
@@ -1058,8 +1058,8 @@ def _update_media_buy_impl(
 
                 from sqlalchemy.orm import attributes
 
-                from src.core.database.database_session import get_db_session
-                from src.core.database.models import MediaPackage as MediaPackageModel
+                from core.database.database_session import get_db_session
+                from core.database.models import MediaPackage as MediaPackageModel
 
                 with get_db_session() as session:
                     # Get the package
@@ -1147,7 +1147,7 @@ def _update_media_buy_impl(
         if req.budget:
             from sqlalchemy import update as sqlalchemy_update
 
-            from src.core.database.models import MediaBuy
+            from core.database.models import MediaBuy
 
             with get_db_session() as db_session:
                 update_stmt = (
@@ -1165,7 +1165,7 @@ def _update_media_buy_impl(
             # Track top-level budget update in affected_packages
             # When top-level budget changes, all packages are affected
             # Get all packages for this media buy from database to report them as affected
-            from src.core.database.models import MediaPackage as MediaPackageModel
+            from core.database.models import MediaPackage as MediaPackageModel
 
             with get_db_session() as db_session:
                 stmt_packages = select(MediaPackageModel).filter_by(media_buy_id=req.media_buy_id)
@@ -1198,7 +1198,7 @@ def _update_media_buy_impl(
 
         from sqlalchemy import update as sqlalchemy_update
 
-        from src.core.database.models import MediaBuy
+        from core.database.models import MediaBuy
 
         update_values = {}
         if req.start_time is not None:
@@ -1288,8 +1288,8 @@ def _update_media_buy_impl(
 
     # Create ObjectWorkflowMapping to link media buy update to workflow step
     # This enables webhook delivery when the update completes
-    from src.core.database.database_session import get_db_session
-    from src.core.database.models import ObjectWorkflowMapping
+    from core.database.database_session import get_db_session
+    from core.database.models import ObjectWorkflowMapping
 
     with get_db_session() as session:
         mapping = ObjectWorkflowMapping(

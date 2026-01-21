@@ -17,10 +17,10 @@ from collections.abc import Sequence
 from flask import Blueprint, Flask, flash, jsonify, redirect, render_template, request, url_for
 from sqlalchemy import func, select
 
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import (
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import (
     AuthorizedProperty,
     InventoryProfile,
     Product,

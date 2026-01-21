@@ -4,8 +4,8 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from src.admin.blueprints.auth import auth_bp, init_oauth
-from src.admin.utils import is_super_admin, is_tenant_admin
+from admin.blueprints.auth import auth_bp, init_oauth
+from admin.utils import is_super_admin, is_tenant_admin
 
 
 class TestAuthBlueprint:
@@ -185,7 +185,7 @@ class TestAuthIntegration:
     @pytest.fixture
     def app(self):
         """Create test Flask app with auth blueprint."""
-        from src.admin.app import create_app
+        from admin.app import create_app
 
         app, _ = create_app({"TESTING": True})
         app.config["SECRET_KEY"] = "test_secret"
@@ -328,7 +328,7 @@ class TestDuplicateTenantPrevention:
         # Create test app with auth blueprint
         from flask import Flask
 
-        from src.admin.blueprints.auth import auth_bp
+        from admin.blueprints.auth import auth_bp
 
         app = Flask(__name__)
         app.config["SECRET_KEY"] = "test_secret"

@@ -14,10 +14,10 @@ from adcp.exceptions import AdagentsNotFoundError, AdagentsTimeoutError, Adagent
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import select
 
-from src.core.config import get_config
-from src.core.database.database_session import get_db_session
-from src.core.database.models import PublisherPartner, Tenant
-from src.core.domain_config import get_tenant_url
+from core.config import get_config
+from core.database.database_session import get_db_session
+from core.database.models import PublisherPartner, Tenant
+from core.domain_config import get_tenant_url
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def list_publisher_partners(tenant_id: str) -> Response | tuple[Response, int]:
             # Get property counts per publisher domain
             from sqlalchemy import func
 
-            from src.core.database.models import AuthorizedProperty
+            from core.database.models import AuthorizedProperty
 
             property_counts_stmt = (
                 select(AuthorizedProperty.publisher_domain, func.count(AuthorizedProperty.property_id))
@@ -246,7 +246,7 @@ def sync_publisher_partners(tenant_id: str) -> Response | tuple[Response, int]:
                 fallback_properties = 0
 
                 if verified_domains:
-                    from src.services.property_discovery_service import get_property_discovery_service
+                    from services.property_discovery_service import get_property_discovery_service
 
                     discovery_service = get_property_discovery_service()
 
@@ -271,7 +271,7 @@ def sync_publisher_partners(tenant_id: str) -> Response | tuple[Response, int]:
                                 f"creating fallback mock property"
                             )
 
-                            from src.core.database.models import AuthorizedProperty, PropertyTag
+                            from core.database.models import AuthorizedProperty, PropertyTag
 
                             # Ensure 'all_inventory' tag exists
                             tag_stmt = select(PropertyTag).where(
@@ -441,7 +441,7 @@ def sync_publisher_partners(tenant_id: str) -> Response | tuple[Response, int]:
             # inventory profiles and products (requires full property details)
             if verified_domains:
                 logger.info(f"Syncing properties from {len(verified_domains)} verified publishers")
-                from src.services.property_discovery_service import get_property_discovery_service
+                from services.property_discovery_service import get_property_discovery_service
 
                 discovery_service = get_property_discovery_service()
                 property_stats = discovery_service.sync_properties_from_adagents_sync(

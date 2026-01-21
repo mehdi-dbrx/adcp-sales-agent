@@ -17,9 +17,9 @@ from flask import Blueprint, jsonify, request, session
 from sqlalchemy import select
 
 from scripts.ops.gam_helper import get_ad_manager_client_for_tenant
-from src.adapters.gam_reporting_service import GAMReportingService
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AdapterConfig, Principal, Tenant
+from adapters.gam_reporting_service import GAMReportingService
+from core.database.database_session import get_db_session
+from core.database.models import AdapterConfig, Principal, Tenant
 
 logger = logging.getLogger(__name__)
 

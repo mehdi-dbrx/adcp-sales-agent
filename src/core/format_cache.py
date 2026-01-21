@@ -16,7 +16,7 @@ from pathlib import Path
 
 from adcp.types import FormatId as LibraryFormatId
 
-from src.core.schemas import FormatId, url
+from core.schemas import FormatId, url
 
 # Default agent URL for AdCP reference implementation
 DEFAULT_AGENT_URL = "https://creative.adcontextprotocol.org"

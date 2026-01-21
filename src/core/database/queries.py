@@ -9,7 +9,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.core.database.models import Creative, CreativeReview
+from core.database.models import Creative, CreativeReview
 
 
 def get_creative_reviews(

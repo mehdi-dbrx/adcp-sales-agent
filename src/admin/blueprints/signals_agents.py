@@ -5,10 +5,10 @@ import logging
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from sqlalchemy import select
 
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import SignalsAgent, Tenant
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import SignalsAgent, Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -250,7 +250,7 @@ def test_signals_agent(tenant_id, agent_id):
             # Test connection by fetching signals
             import asyncio
 
-            from src.core.signals_agent_registry import SignalsAgentRegistry
+            from core.signals_agent_registry import SignalsAgentRegistry
 
             registry = SignalsAgentRegistry()
 

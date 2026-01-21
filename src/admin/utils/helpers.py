@@ -8,8 +8,8 @@ from functools import wraps
 from flask import abort, g, jsonify, redirect, session, url_for
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant, TenantManagementConfig, User
+from core.database.database_session import get_db_session
+from core.database.models import Tenant, TenantManagementConfig, User
 
 logger = logging.getLogger(__name__)
 

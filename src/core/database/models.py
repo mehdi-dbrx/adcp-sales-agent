@@ -25,8 +25,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
-from src.core.database.json_type import JSONType
-from src.core.json_validators import JSONValidatorMixin
+from core.database.json_type import JSONType
+from core.json_validators import JSONValidatorMixin
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +163,7 @@ class Tenant(Base, JSONValidatorMixin):
         """Get decrypted Gemini API key."""
         if not self._gemini_api_key:
             return None
-        from src.core.utils.encryption import decrypt_api_key
+        from core.utils.encryption import decrypt_api_key
 
         try:
             return decrypt_api_key(self._gemini_api_key)
@@ -178,7 +178,7 @@ class Tenant(Base, JSONValidatorMixin):
             self._gemini_api_key = None
             return
 
-        from src.core.utils.encryption import encrypt_api_key
+        from core.utils.encryption import encrypt_api_key
 
         self._gemini_api_key = encrypt_api_key(value)
 
@@ -647,7 +647,7 @@ class TenantAuthConfig(Base):
         """Decrypt and return the OIDC client secret."""
         if not self.oidc_client_secret_encrypted:
             return None
-        from src.core.utils.encryption import decrypt_api_key
+        from core.utils.encryption import decrypt_api_key
 
         return decrypt_api_key(self.oidc_client_secret_encrypted)
 
@@ -657,7 +657,7 @@ class TenantAuthConfig(Base):
         if value is None:
             self.oidc_client_secret_encrypted = None
         else:
-            from src.core.utils.encryption import encrypt_api_key
+            from core.utils.encryption import encrypt_api_key
 
             self.oidc_client_secret_encrypted = encrypt_api_key(value)
 
@@ -1057,7 +1057,7 @@ class AdapterConfig(Base):
         """Get decrypted GAM service account JSON."""
         if not self._gam_service_account_json:
             return None
-        from src.core.utils.encryption import decrypt_api_key
+        from core.utils.encryption import decrypt_api_key
 
         try:
             return decrypt_api_key(self._gam_service_account_json)
@@ -1072,7 +1072,7 @@ class AdapterConfig(Base):
             self._gam_service_account_json = None
             return
 
-        from src.core.utils.encryption import encrypt_api_key
+        from core.utils.encryption import encrypt_api_key
 
         self._gam_service_account_json = encrypt_api_key(value)
 

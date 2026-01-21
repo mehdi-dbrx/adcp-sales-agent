@@ -128,7 +128,7 @@ def _get_or_create_audit_logger(tenant_id: str):
     Returns:
         AuditLogger instance
     """
-    from src.core.audit_logger import get_audit_logger
+    from core.audit_logger import get_audit_logger
 
     # Cache key includes tenant_id to handle multi-tenant requests
     cache_key = f"audit_logger_{tenant_id}"

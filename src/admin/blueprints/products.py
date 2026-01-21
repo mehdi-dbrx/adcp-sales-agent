@@ -10,14 +10,14 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import PricingOption, Product, ProductInventoryMapping, Tenant
-from src.core.database.product_pricing import get_product_pricing_options
-from src.core.schemas import Format
-from src.core.validation import sanitize_form_data
-from src.services.gam_product_config_service import GAMProductConfigService
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import PricingOption, Product, ProductInventoryMapping, Tenant
+from core.database.product_pricing import get_product_pricing_options
+from core.schemas import Format
+from core.validation import sanitize_form_data
+from services.gam_product_config_service import GAMProductConfigService
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +123,7 @@ def get_creative_formats(
     Returns:
         List of format dictionaries for frontend
     """
-    from src.core.format_resolver import list_available_formats
+    from core.format_resolver import list_available_formats
 
     # Get formats from creative agent registry with optional filtering
     try:
@@ -582,7 +582,7 @@ def _render_add_product_form(tenant_id, tenant, adapter_type, currencies, form_d
     Returns:
         Rendered template response
     """
-    from src.core.database.models import (
+    from core.database.models import (
         AuthorizedProperty,
         GAMInventory,
         InventoryProfile,
@@ -677,7 +677,7 @@ def add_product(tenant_id):
         adapter_type = tenant.ad_server or "mock"
 
         # Get tenant's supported currencies from currency_limits
-        from src.core.database.models import CurrencyLimit
+        from core.database.models import CurrencyLimit
 
         currency_limits = db_session.scalars(select(CurrencyLimit).filter_by(tenant_id=tenant_id)).all()
         currencies = [limit.currency_code for limit in currency_limits]
@@ -705,7 +705,7 @@ def add_product(tenant_id):
                     formats_parsed = json.loads(formats_json)
                     if isinstance(formats_parsed, list) and formats_parsed:
                         # Validate formats against creative agent registry
-                        from src.core.creative_agent_registry import get_creative_agent_registry
+                        from core.creative_agent_registry import get_creative_agent_registry
 
                         try:
                             registry = get_creative_agent_registry()
@@ -843,7 +843,7 @@ def add_product(tenant_id):
                             return _render_add_product_form(tenant_id, tenant, adapter_type, currencies, form_data)
 
                         # Validate ad unit IDs exist in inventory
-                        from src.core.database.models import GAMInventory
+                        from core.database.models import GAMInventory
 
                         existing_ad_units = db_session.scalars(
                             select(GAMInventory).filter(
@@ -873,7 +873,7 @@ def add_product(tenant_id):
                         id_list = [id.strip() for id in placement_ids.split(",") if id.strip()]
 
                         # Validate placement IDs exist in inventory
-                        from src.core.database.models import GAMInventory
+                        from core.database.models import GAMInventory
 
                         existing_placements = db_session.scalars(
                             select(GAMInventory).filter(
@@ -953,7 +953,7 @@ def add_product(tenant_id):
                     try:
                         profile_id = int(inventory_profile_id)
                         # SECURITY: Verify profile belongs to this tenant
-                        from src.core.database.models import InventoryProfile
+                        from core.database.models import InventoryProfile
 
                         profile_stmt = select(InventoryProfile).filter_by(id=profile_id)
                         profile = db_session.scalars(profile_stmt).first()
@@ -1058,7 +1058,7 @@ def add_product(tenant_id):
                             tags_by_domain[domain].append(tag)
 
                     # Validate that tags exist for properties from these publishers
-                    from src.core.database.models import AuthorizedProperty
+                    from core.database.models import AuthorizedProperty
 
                     for domain, tags in tags_by_domain.items():
                         # Check that properties with these tags exist for this publisher
@@ -1104,7 +1104,7 @@ def add_product(tenant_id):
                         flash("Please select at least one property", "error")
                         return _render_add_product_form(tenant_id, tenant, adapter_type, currencies, form_data)
 
-                    from src.core.database.models import AuthorizedProperty
+                    from core.database.models import AuthorizedProperty
 
                     # Query by property_id (string), not integer id
                     properties = db_session.scalars(
@@ -1148,7 +1148,7 @@ def add_product(tenant_id):
                         # No properties selected, default to empty property_tags to satisfy DB constraint
                         product_kwargs["property_tags"] = []
                     else:
-                        from src.core.database.models import AuthorizedProperty
+                        from core.database.models import AuthorizedProperty
 
                         # Query by property_id (string), not integer id
                         properties = db_session.scalars(
@@ -1341,7 +1341,7 @@ def edit_product(tenant_id, product_id):
         adapter_type = tenant.ad_server or "mock"
 
         # Get tenant's supported currencies from currency_limits
-        from src.core.database.models import CurrencyLimit
+        from core.database.models import CurrencyLimit
 
         currency_limits = db_session.scalars(select(CurrencyLimit).filter_by(tenant_id=tenant_id)).all()
         currencies = [limit.currency_code for limit in currency_limits]
@@ -1360,7 +1360,7 @@ def edit_product(tenant_id, product_id):
             formats_parsed = json.loads(formats_json)
             if isinstance(formats_parsed, list) and formats_parsed:
                 # Validate formats against creative agent registry
-                from src.core.creative_agent_registry import get_creative_agent_registry
+                from core.creative_agent_registry import get_creative_agent_registry
 
                 try:
                     registry = get_creative_agent_registry()
@@ -1473,7 +1473,7 @@ def edit_product(tenant_id, product_id):
                     try:
                         profile_id = int(inventory_profile_id)
                         # SECURITY: Verify profile belongs to this tenant
-                        from src.core.database.models import InventoryProfile
+                        from core.database.models import InventoryProfile
 
                         profile_stmt = select(InventoryProfile).filter_by(id=profile_id)
                         profile = db_session.scalars(profile_stmt).first()
@@ -1577,7 +1577,7 @@ def edit_product(tenant_id, product_id):
                     if property_ids_list:
                         from collections import defaultdict
 
-                        from src.core.database.models import AuthorizedProperty
+                        from core.database.models import AuthorizedProperty
 
                         # Query properties to get their publisher_domain
                         properties = db_session.scalars(
@@ -1613,7 +1613,7 @@ def edit_product(tenant_id, product_id):
                     # Get selected full property IDs (legacy mode)
                     property_ids_list = request.form.getlist("full_property_ids")
                     if property_ids_list:
-                        from src.core.database.models import AuthorizedProperty
+                        from core.database.models import AuthorizedProperty
 
                         properties = db_session.scalars(
                             select(AuthorizedProperty).filter(
@@ -1652,7 +1652,7 @@ def edit_product(tenant_id, product_id):
                 # Update implementation_config with GAM-specific fields
                 # Note: This must run even if line_item_type is not present (automatic mode)
                 if adapter_type == "google_ad_manager":
-                    from src.services.gam_product_config_service import GAMProductConfigService
+                    from services.gam_product_config_service import GAMProductConfigService
 
                     # Start with existing config to preserve fields not in the form
                     base_config = product.implementation_config.copy() if product.implementation_config else {}
@@ -1734,7 +1734,7 @@ def edit_product(tenant_id, product_id):
 
                     # Sync inventory mappings based on implementation_config
                     # Delete all existing mappings first
-                    from src.core.database.models import ProductInventoryMapping
+                    from core.database.models import ProductInventoryMapping
 
                     existing_mappings = db_session.scalars(
                         select(ProductInventoryMapping).filter_by(tenant_id=tenant_id, product_id=product_id)
@@ -2012,7 +2012,7 @@ def edit_product(tenant_id, product_id):
             product_dict["pricing_options"] = pricing_options_list
 
             # Get all principals for this tenant (for access control dropdown)
-            from src.core.database.models import Principal
+            from core.database.models import Principal
 
             principals = db_session.scalars(
                 select(Principal).filter_by(tenant_id=tenant_id).order_by(Principal.name)
@@ -2020,7 +2020,7 @@ def edit_product(tenant_id, product_id):
             principals_list = [{"principal_id": p.principal_id, "name": p.name} for p in principals]
 
             # Get authorized properties for publisher properties selector
-            from src.core.database.models import AuthorizedProperty
+            from core.database.models import AuthorizedProperty
 
             authorized_properties_query = db_session.scalars(
                 select(AuthorizedProperty).filter_by(tenant_id=tenant_id).order_by(AuthorizedProperty.name)
@@ -2042,7 +2042,7 @@ def edit_product(tenant_id, product_id):
 
             # Show adapter-specific form
             if adapter_type == "google_ad_manager":
-                from src.core.database.models import GAMInventory
+                from core.database.models import GAMInventory
 
                 inventory_count = db_session.scalar(
                     select(func.count()).select_from(GAMInventory).filter_by(tenant_id=tenant_id)
@@ -2080,7 +2080,7 @@ def edit_product(tenant_id, product_id):
                 logger.info(f"[DEBUG] Final selected_format_ids set: {selected_format_ids}")
 
                 # Fetch assigned inventory for this product
-                from src.core.database.models import ProductInventoryMapping
+                from core.database.models import ProductInventoryMapping
 
                 assigned_inventory_query = (
                     select(ProductInventoryMapping, GAMInventory)
@@ -2109,7 +2109,7 @@ def edit_product(tenant_id, product_id):
                 ]
 
                 # Get inventory profiles for this tenant
-                from src.core.database.models import InventoryProfile
+                from core.database.models import InventoryProfile
 
                 stmt_profiles = select(InventoryProfile).filter_by(tenant_id=tenant_id).order_by(InventoryProfile.name)
                 inventory_profiles = db_session.scalars(stmt_profiles).all()
@@ -2163,7 +2163,7 @@ def delete_product(tenant_id, product_id):
 
             # Check if product is used in any active media buys
             # Import here to avoid circular imports
-            from src.core.database.models import MediaBuy
+            from core.database.models import MediaBuy
 
             stmt = (
                 select(MediaBuy)
@@ -2247,7 +2247,7 @@ def assign_inventory_to_product(tenant_id, product_id):
     }
     """
     try:
-        from src.core.database.models import GAMInventory, ProductInventoryMapping
+        from core.database.models import GAMInventory, ProductInventoryMapping
 
         data = request.get_json()
         if not data:
@@ -2369,7 +2369,7 @@ def assign_inventory_to_product(tenant_id, product_id):
 def get_product_inventory(tenant_id, product_id):
     """Get all inventory items assigned to a product."""
     try:
-        from src.core.database.models import GAMInventory, ProductInventoryMapping
+        from core.database.models import GAMInventory, ProductInventoryMapping
 
         with get_db_session() as db_session:
             # Verify product exists
@@ -2418,7 +2418,7 @@ def get_product_inventory(tenant_id, product_id):
 def unassign_inventory_from_product(tenant_id, product_id, mapping_id):
     """Remove an inventory assignment from a product (API endpoint)."""
     try:
-        from src.core.database.models import ProductInventoryMapping
+        from core.database.models import ProductInventoryMapping
 
         with get_db_session() as db_session:
             # Find the mapping
@@ -2440,7 +2440,7 @@ def unassign_inventory_from_product(tenant_id, product_id, mapping_id):
             # Update product's implementation_config to remove the inventory ID
             from sqlalchemy.orm import attributes
 
-            from src.core.database.models import GAMInventory
+            from core.database.models import GAMInventory
 
             product = db_session.scalars(select(Product).filter_by(tenant_id=tenant_id, product_id=product_id)).first()
 

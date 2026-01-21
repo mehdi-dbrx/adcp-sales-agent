@@ -18,16 +18,16 @@ from fastmcp.server.context import Context
 from fastmcp.tools.tool import ToolResult
 from sqlalchemy import select
 
-from src.core.audit_logger import get_audit_logger
-from src.core.auth import get_principal_from_context
-from src.core.config_loader import get_current_tenant, set_current_tenant
-from src.core.database.database_session import get_db_session
-from src.core.database.models import PublisherPartner
-from src.core.helpers import log_tool_activity
-from src.core.schemas import ListAuthorizedPropertiesResponse
-from src.core.testing_hooks import get_testing_context
-from src.core.tool_context import ToolContext
-from src.core.validation_helpers import safe_parse_json_field
+from core.audit_logger import get_audit_logger
+from core.auth import get_principal_from_context
+from core.config_loader import get_current_tenant, set_current_tenant
+from core.database.database_session import get_db_session
+from core.database.models import PublisherPartner
+from core.helpers import log_tool_activity
+from core.schemas import ListAuthorizedPropertiesResponse
+from core.testing_hooks import get_testing_context
+from core.tool_context import ToolContext
+from core.validation_helpers import safe_parse_json_field
 
 logger = logging.getLogger(__name__)
 
@@ -76,8 +76,8 @@ def _list_authorized_properties_impl(
     tenant_id = tenant["tenant_id"]
 
     # Apply testing hooks
-    from src.core.testing_hooks import AdCPTestContext
-    from src.core.tool_context import ToolContext
+    from core.testing_hooks import AdCPTestContext
+    from core.tool_context import ToolContext
 
     if isinstance(context, ToolContext):
         # ToolContext has testing_context field directly

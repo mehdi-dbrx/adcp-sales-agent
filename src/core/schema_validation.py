@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 
 from pydantic import BaseModel, ConfigDict
 
-from src.core.domain_config import get_sales_agent_url
+from core.domain_config import get_sales_agent_url
 
 
 class SchemaMetadata(BaseModel):
@@ -189,7 +189,7 @@ def create_schema_registry() -> dict[str, dict[str, Any]]:
     Returns:
         Dictionary mapping schema names to JSON Schema objects
     """
-    from src.core.schemas import (
+    from core.schemas import (
         GetMediaBuyDeliveryResponse,
         GetProductsResponse,
         GetSignalsResponse,

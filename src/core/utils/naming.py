@@ -94,7 +94,7 @@ def generate_auto_name(
         "Nike Air Max Campaign - Q4 Holiday Push"
         "Acme Corp Brand Awareness - Premium Video"
     """
-    from src.services.ai import AIServiceFactory
+    from services.ai import AIServiceFactory
 
     factory = AIServiceFactory()
 
@@ -112,7 +112,7 @@ def generate_auto_name(
         return _get_fallback_name(request)
 
     try:
-        from src.services.ai.agents.naming_agent import (
+        from services.ai.agents.naming_agent import (
             create_naming_agent,
             generate_name_async,
         )

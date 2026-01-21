@@ -53,9 +53,11 @@
 
     .metric-value {
         font-size: 2rem;
-        font-weight: 700;
+        font-weight: 600;
         color: #111827;
         line-height: 1.2;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif;
+        letter-spacing: -0.03em;
     }
 
     .metric-change {
@@ -162,6 +164,14 @@
     }
 
     .activity-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .activity-icon i {
+        font-size: 1rem;
+    }
         font-size: 1.5rem;
         margin-right: 0;
         flex-shrink: 0;
@@ -341,6 +351,10 @@
         border-radius: 6px;
         font-size: 1rem;
     }
+    
+    .action-icon i {
+        font-size: 1.5rem;
+    }
 
     .action-icon.settings { background: #ede9fe; color: #7c3aed; }
     .action-icon.products { background: #dbeafe; color: #2563eb; }
@@ -486,7 +500,7 @@
 <!-- Header Section -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <h1 style="margin: 0; font-size: 1.875rem; font-weight: 700; color: #111827;">{{ tenant.name }}</h1>
+        <h1 style="margin: 0; font-size: 1.875rem; font-weight: 600; color: #111827; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif; letter-spacing: -0.03em; line-height: 1.2;">{{ tenant.name }}</h1>
         <p style="margin: 0.25rem 0 0 0; color: #6b7280; font-size: 0.875rem;">
             Operational Dashboard ·
             {% if tenant.ad_server %}{{ tenant.ad_server|title|replace('_', ' ') }}{% else %}No Ad Server{% endif %}
@@ -583,11 +597,11 @@
                         <div class="activity-header" style="cursor: pointer; padding: 1rem;" onclick="toggleActivityDetails('activity-{{ loop.index }}')">
                             <div class="activity-main">
                                 <span class="activity-icon">
-                                    {% if activity.type == 'product_search' %}🔍
-                                    {% elif activity.type == 'media_buy' %}💰
-                                    {% elif activity.type == 'action_needed' %}⚠️
-                                    {% elif activity.type == 'creative_review' %}🎨
-                                    {% else %}📌{% endif %}
+                                    {% if activity.type == 'product_search' %}<i class="fas fa-search"></i>
+                                    {% elif activity.type == 'media_buy' %}<i class="fas fa-shopping-cart"></i>
+                                    {% elif activity.type == 'action_needed' %}<i class="fas fa-exclamation-circle"></i>
+                                    {% elif activity.type == 'creative_review' %}<i class="fas fa-palette"></i>
+                                    {% else %}<i class="fas fa-thumbtack"></i>{% endif %}
                                 </span>
                                 <div class="activity-content-text">
                                     <div class="activity-summary">{{ activity.title }}</div>
@@ -683,7 +697,7 @@
             <h3>Operations</h3>
             <div class="action-grid">
                 <a href="{{ script_name }}/tenant/{{ tenant.tenant_id }}/creatives/review" class="action-button">
-                    <div class="action-icon creatives">🎨</div>
+                    <div class="action-icon creatives"><i class="fas fa-palette"></i></div>
                     <div>
                         <div style="font-weight: 600;">Uploaded Creatives</div>
                         <div style="font-size: 0.75rem; color: #6b7280;">View all creatives & media buys</div>
@@ -691,7 +705,7 @@
                 </a>
 
                 <a href="{{ script_name }}/tenant/{{ tenant.tenant_id }}/reporting" class="action-button">
-                    <div class="action-icon reports">📈</div>
+                    <div class="action-icon reports"><i class="fas fa-chart-line"></i></div>
                     <div>
                         <div style="font-weight: 600;">Reports</div>
                         <div style="font-size: 0.75rem; color: #6b7280;">Performance & delivery data</div>
@@ -699,7 +713,7 @@
                 </a>
 
                 <a href="{{ script_name }}/tenant/{{ tenant.tenant_id }}/workflows" class="action-button">
-                    <div class="action-icon workflows">📋</div>
+                    <div class="action-icon workflows"><i class="fas fa-tasks"></i></div>
                     <div>
                         <div style="font-weight: 600;">Workflows</div>
                         <div style="font-size: 0.75rem; color: #6b7280;">Approvals & reviews</div>
@@ -707,7 +721,7 @@
                 </a>
 
                 <a href="{{ script_name }}/tenant/{{ tenant.tenant_id }}/webhooks" class="action-button">
-                    <div class="action-icon" style="background: #e0e7ff; color: #4338ca;">🔔</div>
+                    <div class="action-icon" style="background: #e0e7ff; color: #4338ca;"><i class="fas fa-bell"></i></div>
                     <div>
                         <div style="font-weight: 600;">Webhooks</div>
                         <div style="font-size: 0.75rem; color: #6b7280;">Delivery notifications</div>
@@ -715,7 +729,7 @@
                 </a>
 
                 <a href="{{ script_name }}/tenant/{{ tenant.tenant_id }}/settings" class="action-button">
-                    <div class="action-icon settings">⚙️</div>
+                    <div class="action-icon settings"><i class="fas fa-cog"></i></div>
                     <div>
                         <div style="font-weight: 600;">Settings</div>
                         <div style="font-size: 0.75rem; color: #6b7280;">Products, properties, configuration</div>
@@ -1022,14 +1036,14 @@ function addActivity(activity, isNewActivity = true) {
 
     // Determine icon based on activity type
     const iconMap = {
-        'media-buy': '💰',
-        'creative': '🎨',
-        'error': '❌',
-        'product-query': '🔍',
-        'human-task': '⚠️',
-        'api-call': '📡'
+        'media-buy': '<i class="fas fa-shopping-cart"></i>',
+        'creative': '<i class="fas fa-palette"></i>',
+        'error': '<i class="fas fa-times-circle"></i>',
+        'product-query': '<i class="fas fa-search"></i>',
+        'human-task': '<i class="fas fa-exclamation-circle"></i>',
+        'api-call': '<i class="fas fa-satellite-dish"></i>'
     };
-    const icon = iconMap[activity.type] || '📌';
+    const icon = iconMap[activity.type] || '<i class="fas fa-thumbtack"></i>';
 
     // Build a clear summary line
     let summaryText = '';

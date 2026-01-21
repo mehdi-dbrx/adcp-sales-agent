@@ -5,9 +5,9 @@ import logging
 from fastmcp.server import Context
 from sqlalchemy import select
 
-from src.core.config_loader import set_current_tenant
-from src.core.database.database_session import execute_with_retry
-from src.core.database.models import Principal, Tenant
+from core.config_loader import set_current_tenant
+from core.database.database_session import execute_with_retry
+from core.database.models import Principal, Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def get_principal_from_token(token: str, tenant_id: str | None = None) -> str | 
                 tenant = session.scalars(stmt).first()
                 if tenant:
                     logger.info(f"[AUTH] Tenant found: {tenant.tenant_id}, is_active={tenant.is_active}")
-                    from src.core.utils.tenant_utils import serialize_tenant_to_dict
+                    from core.utils.tenant_utils import serialize_tenant_to_dict
 
                     tenant_dict = serialize_tenant_to_dict(tenant)
                     set_current_tenant(tenant_dict)
@@ -147,7 +147,7 @@ def get_principal_object(principal_id: str) -> Principal | None:
         return None
 
     def _get_principal_object(session):
-        from src.core.schemas import Principal as PrincipalSchema
+        from core.schemas import Principal as PrincipalSchema
 
         # Query the database for the principal
         stmt = select(Principal).filter_by(principal_id=principal_id)

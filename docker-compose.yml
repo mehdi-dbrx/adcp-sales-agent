@@ -86,6 +86,8 @@ services:
       # Per-tenant Setup Mode enables test credentials for new tenants
       # Override .env ports to match nginx-development.conf expectations
       ADCP_SALES_PORT: "8080"
+      # Agent URL for publisher sync
+      SALES_AGENT_DOMAIN: "localhost:8000"
       # Development settings
       PYTHONPATH: "/app/.venv/lib/python3.12/site-packages"
       PYTHONUNBUFFERED: "1"
@@ -129,6 +131,8 @@ services:
       DATABASE_URL: postgresql://adcp_user:secure_password_change_me@postgres:5432/adcp?sslmode=disable
       SKIP_NGINX: "true"
       # Per-tenant Setup Mode enables test credentials for new tenants
+      # Agent URL for publisher sync
+      SALES_AGENT_DOMAIN: "localhost:8000"
       # Development settings
       PYTHONPATH: "/app/.venv/lib/python3.12/site-packages"
       PYTHONUNBUFFERED: "1"

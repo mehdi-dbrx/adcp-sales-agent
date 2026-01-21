@@ -13,9 +13,9 @@ from typing import Any
 
 from sqlalchemy import delete, select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Strategy as StrategyModel
-from src.core.database.models import StrategyState
+from core.database.database_session import get_db_session
+from core.database.models import Strategy as StrategyModel
+from core.database.models import StrategyState
 
 
 class StrategyError(Exception):

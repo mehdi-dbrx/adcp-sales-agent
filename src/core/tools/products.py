@@ -24,19 +24,19 @@ from sqlalchemy import select
 # Imports for implementation
 from sqlalchemy.orm import joinedload
 
-from src.core.audit_logger import get_audit_logger
-from src.core.auth import get_principal_from_context, get_principal_object
-from src.core.config_loader import set_current_tenant
-from src.core.database.database_session import get_db_session
-from src.core.schema_helpers import create_get_products_request
-from src.core.schemas import (
+from core.audit_logger import get_audit_logger
+from core.auth import get_principal_from_context, get_principal_object
+from core.config_loader import set_current_tenant
+from core.database.database_session import get_db_session
+from core.schema_helpers import create_get_products_request
+from core.schemas import (
     GetProductsResponse,
     Product,  # Extends library Product
 )
-from src.core.testing_hooks import apply_testing_hooks, get_testing_context
-from src.core.tool_context import ToolContext
-from src.core.validation_helpers import format_validation_error, safe_parse_json_field
-from src.services.policy_check_service import PolicyCheckService, PolicyStatus
+from core.testing_hooks import apply_testing_hooks, get_testing_context
+from core.tool_context import ToolContext
+from core.validation_helpers import format_validation_error, safe_parse_json_field
+from services.policy_check_service import PolicyCheckService, PolicyStatus
 
 logger = logging.getLogger(__name__)
 
@@ -57,28 +57,28 @@ def get_adapter_default_channels(adapter_type: str) -> list[str]:
     adapter_classes: dict[str, type] = {}
 
     try:
-        from src.adapters.google_ad_manager import GoogleAdManager
+        from adapters.google_ad_manager import GoogleAdManager
 
         adapter_classes["google_ad_manager"] = GoogleAdManager
     except ImportError:
         pass
 
     try:
-        from src.adapters.mock_ad_server import MockAdServer
+        from adapters.mock_ad_server import MockAdServer
 
         adapter_classes["mock"] = MockAdServer
     except ImportError:
         pass
 
     try:
-        from src.adapters.kevel import Kevel
+        from adapters.kevel import Kevel
 
         adapter_classes["kevel"] = Kevel
     except ImportError:
         pass
 
     try:
-        from src.adapters.triton_digital import TritonDigital
+        from adapters.triton_digital import TritonDigital
 
         adapter_classes["triton"] = TritonDigital
     except ImportError:
@@ -114,7 +114,7 @@ def get_recommended_cpm(product: Product) -> float | None:
 
 
 # Import conversion utilities from dedicated module to avoid circular imports
-from src.core.product_conversion import convert_product_model_to_schema
+from core.product_conversion import convert_product_model_to_schema
 
 
 async def _get_products_impl(
@@ -132,7 +132,7 @@ async def _get_products_impl(
     Returns:
         GetProductsResponse containing matching products
     """
-    from src.core.tool_context import ToolContext
+    from core.tool_context import ToolContext
 
     start_time = time.time()
 
@@ -142,7 +142,7 @@ async def _get_products_impl(
         testing_ctx_raw = context.testing_context
         # Convert dict testing context back to TestContext object if needed
         if isinstance(testing_ctx_raw, dict):
-            from src.core.testing_hooks import AdCPTestContext
+            from core.testing_hooks import AdCPTestContext
 
             testing_ctx: AdCPTestContext | None = AdCPTestContext(**testing_ctx_raw)
         else:
@@ -369,7 +369,7 @@ async def _get_products_impl(
 
     # Query products directly from database
     # This replaces the product_catalog_providers abstraction with simple direct access
-    from src.core.database.models import Product as ProductModel
+    from core.database.models import Product as ProductModel
 
     with get_db_session() as db_session:
         stmt = (
@@ -434,7 +434,7 @@ async def _get_products_impl(
 
     # Generate dynamic product variants from signals agents
     try:
-        from src.services.dynamic_products import generate_variants_for_brief
+        from services.dynamic_products import generate_variants_for_brief
 
         # Get our agent URL for deployment specification
         our_agent_url = tenant.get("virtual_host")  # Our sales agent URL (e.g., https://sales.example.com)
@@ -459,7 +459,7 @@ async def _get_products_impl(
     # Enrich products with dynamic pricing from cached performance metrics
     # Updates pricing_options with price_guidance (floor, recommended) and estimated_exposures
     try:
-        from src.services.dynamic_pricing_service import DynamicPricingService
+        from services.dynamic_pricing_service import DynamicPricingService
 
         # Extract country from request if available (future enhancement: parse from targeting)
         country_code = None  # TODO: Extract from targeting if provided
@@ -496,7 +496,7 @@ async def _get_products_impl(
             # Filter by format_types
             if req.filters.format_types:
                 # Product.format_ids is list[str] (format IDs), need to look up types from FORMAT_REGISTRY
-                from src.core.schemas import get_format_by_id
+                from core.schemas import get_format_by_id
 
                 product_format_types = set()
                 for format_id in product.format_ids:
@@ -681,11 +681,11 @@ async def _get_products_impl(
     product_ranking_prompt = tenant.get("product_ranking_prompt")
     if product_ranking_prompt and brief_text and eligible_products:
         try:
-            from src.services.ai.agents.ranking_agent import (
+            from services.ai.agents.ranking_agent import (
                 create_ranking_agent,
                 rank_products_async,
             )
-            from src.services.ai.factory import get_factory
+            from services.ai.factory import get_factory
 
             factory = get_factory()
             if factory.is_ai_enabled():
@@ -734,7 +734,7 @@ async def _get_products_impl(
     if principal and eligible_products:
         try:
             # Use correct get_adapter from adapter_helpers (accepts Principal and dry_run)
-            from src.core.helpers.adapter_helpers import get_adapter
+            from core.helpers.adapter_helpers import get_adapter
 
             # Get adapter in dry-run mode (no actual ad server calls)
             adapter = get_adapter(principal, dry_run=True)
@@ -888,8 +888,8 @@ def get_product_catalog() -> list[Product]:
     from sqlalchemy import select
     from sqlalchemy.orm import selectinload
 
-    from src.core.config_loader import get_current_tenant
-    from src.core.database.models import Product as ModelProduct
+    from core.config_loader import get_current_tenant
+    from core.database.models import Product as ModelProduct
 
     tenant = get_current_tenant()
 

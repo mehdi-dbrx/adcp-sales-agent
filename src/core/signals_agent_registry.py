@@ -84,8 +84,8 @@ class SignalsAgentRegistry:
         # Load tenant-specific agents from database
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import SignalsAgent as SignalsAgentModel
+        from core.database.database_session import get_db_session
+        from core.database.models import SignalsAgent as SignalsAgentModel
 
         with get_db_session() as session:
             stmt = select(SignalsAgentModel).filter_by(tenant_id=tenant_id, enabled=True)

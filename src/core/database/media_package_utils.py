@@ -9,8 +9,8 @@ from typing import Any
 
 from sqlalchemy.orm import attributes
 
-from src.core.database.models import MediaPackage as DBMediaPackage
-from src.core.schemas import Budget
+from core.database.models import MediaPackage as DBMediaPackage
+from core.schemas import Budget
 
 
 def update_media_package_fields(

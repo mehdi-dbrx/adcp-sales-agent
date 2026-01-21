@@ -9,7 +9,7 @@ from typing import Any
 
 from sqlalchemy import inspect, text
 
-from src.core.database.database_session import get_db_session
+from core.database.database_session import get_db_session
 
 logger = logging.getLogger(__name__)
 

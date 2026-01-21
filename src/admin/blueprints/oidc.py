@@ -9,10 +9,10 @@ from authlib.integrations.flask_client import OAuth
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import select
 
-from src.admin.utils import require_tenant_access
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant, User
-from src.services.auth_config_service import (
+from admin.utils import require_tenant_access
+from core.database.database_session import get_db_session
+from core.database.models import Tenant, User
+from services.auth_config_service import (
     disable_oidc,
     enable_oidc,
     get_auth_config_summary,
@@ -132,7 +132,7 @@ def enable(tenant_id: str):
     """Enable OIDC authentication for a tenant."""
     if enable_oidc(tenant_id):
         # Verify the change persisted
-        from src.core.database.models import TenantAuthConfig
+        from core.database.models import TenantAuthConfig
 
         with get_db_session() as db_session:
             config = db_session.scalars(select(TenantAuthConfig).filter_by(tenant_id=tenant_id)).first()
@@ -227,7 +227,7 @@ def callback():
                 return redirect(url_for("auth.login"))
 
             # Get OIDC config directly from this session to avoid nested session issues
-            from src.core.database.models import TenantAuthConfig
+            from core.database.models import TenantAuthConfig
 
             config = db_session.scalars(select(TenantAuthConfig).filter_by(tenant_id=tenant_id)).first()
             if not config or not config.oidc_client_id:
@@ -283,7 +283,7 @@ def callback():
             # Test flow - mark config as verified and enable SSO in one transaction
             redirect_uri = get_tenant_redirect_uri(tenant)
             from datetime import UTC, datetime
-            from src.core.database.models import TenantAuthConfig
+            from core.database.models import TenantAuthConfig
 
             with get_db_session() as db_session:
                 config = db_session.scalars(select(TenantAuthConfig).filter_by(tenant_id=tenant_id)).first()
@@ -391,7 +391,7 @@ def login(tenant_id: str):
 
         # In setup mode, allow login when OIDC is configured (even if not enabled)
         # This lets users test the full login flow before enabling
-        from src.core.database.models import TenantAuthConfig
+        from core.database.models import TenantAuthConfig
 
         auth_config = db_session.scalars(
             select(TenantAuthConfig).filter_by(tenant_id=tenant_id)

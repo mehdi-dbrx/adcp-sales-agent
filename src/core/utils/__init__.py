@@ -1,6 +1,6 @@
 """Core utility functions."""
 
-from src.core.utils.naming import (
+from core.utils.naming import (
     apply_naming_template,
     build_line_item_name_context,
     build_order_name_context,

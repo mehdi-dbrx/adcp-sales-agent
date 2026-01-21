@@ -59,7 +59,7 @@ def main():
         import sys
 
         sys.path.insert(0, ".")
-        from src.core.startup import initialize_application
+        from core.startup import initialize_application
 
         logger.info("🚀 Initializing Admin UI...")
         initialize_application()
@@ -73,7 +73,7 @@ def main():
         sys.exit(1)
 
     # Import the app factory
-    from src.admin.app import create_app
+    from admin.app import create_app
 
     # Create the Flask app
     app, socketio = create_app()

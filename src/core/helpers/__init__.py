@@ -7,10 +7,10 @@ This package contains modular helper functions extracted from main.py for better
 - context_helpers: Context extraction for authentication and tenant setup
 """
 
-from src.core.helpers.activity_helpers import log_tool_activity
-from src.core.helpers.adapter_helpers import get_adapter
-from src.core.helpers.context_helpers import get_principal_id_from_context
-from src.core.helpers.creative_helpers import (
+from core.helpers.activity_helpers import log_tool_activity
+from core.helpers.adapter_helpers import get_adapter
+from core.helpers.context_helpers import get_principal_id_from_context
+from core.helpers.creative_helpers import (
     FormatInfo,
     FormatParameters,
     _convert_creative_to_adapter_asset,

@@ -9,11 +9,11 @@ import asyncio
 from flask import Blueprint, jsonify, request
 from sqlalchemy import select
 
-from src.admin.utils import require_auth
-from src.core.creative_agent_registry import get_creative_agent_registry
-from src.core.database.database_session import get_db_session
-from src.core.database.models import CreativeAgent as CreativeAgentModel
-from src.core.database.models import Tenant as TenantModel
+from admin.utils import require_auth
+from core.creative_agent_registry import get_creative_agent_registry
+from core.database.database_session import get_db_session
+from core.database.models import CreativeAgent as CreativeAgentModel
+from core.database.models import Tenant as TenantModel
 
 bp = Blueprint("format_search", __name__, url_prefix="/api/formats")
 
@@ -180,7 +180,7 @@ def get_format_templates():
 
     # Import GAM standard sizes for common size quick-picks
     try:
-        from src.adapters.gam.utils.constants import GAM_STANDARD_SIZES
+        from adapters.gam.utils.constants import GAM_STANDARD_SIZES
     except ImportError:
         GAM_STANDARD_SIZES = {}
 

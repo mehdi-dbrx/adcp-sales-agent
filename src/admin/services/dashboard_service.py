@@ -9,11 +9,11 @@ import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from src.admin.services.business_activity_service import get_business_activities
-from src.admin.services.media_buy_readiness_service import MediaBuyReadinessService
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Creative, MediaBuy, Principal, Product, Tenant
-from src.core.schemas import CreativeStatusEnum
+from admin.services.business_activity_service import get_business_activities
+from admin.services.media_buy_readiness_service import MediaBuyReadinessService
+from core.database.database_session import get_db_session
+from core.database.models import Creative, MediaBuy, Principal, Product, Tenant
+from core.schemas import CreativeStatusEnum
 
 logger = logging.getLogger(__name__)
 

@@ -13,8 +13,8 @@ from typing import Any
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import SyncJob
+from core.database.database_session import get_db_session
+from core.database.models import SyncJob
 
 logger = logging.getLogger(__name__)
 
@@ -133,8 +133,8 @@ def _run_approval_thread(
         logger.info(f"[{approval_id}] Starting order approval polling for order {order_id}")
 
         # Import here to avoid circular dependencies
-        from src.adapters.gam.managers.orders import GAMOrdersManager
-        from src.core.database.models import AdapterConfig
+        from adapters.gam.managers.orders import GAMOrdersManager
+        from core.database.models import AdapterConfig
 
         # Get adapter config
         with get_db_session() as db:
@@ -148,7 +148,7 @@ def _run_approval_thread(
                 return
 
         # Create GAM client
-        from src.adapters.gam.client import GAMClientManager
+        from adapters.gam.client import GAMClientManager
 
         # Build config dict from adapter_config
         config_dict = {
@@ -374,7 +374,7 @@ def _send_approval_webhook(
             payload["attempts"] = attempts
 
         # Get webhook authentication from push notification config
-        from src.core.database.models import PushNotificationConfig
+        from core.database.models import PushNotificationConfig
 
         with get_db_session() as db:
             stmt = select(PushNotificationConfig).filter_by(

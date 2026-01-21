@@ -5,7 +5,7 @@ from collections.abc import Callable
 from functools import wraps
 from typing import TypeVar
 
-from src.core.logging_config import oauth_structured_logger
+from core.logging_config import oauth_structured_logger
 
 T = TypeVar("T")
 

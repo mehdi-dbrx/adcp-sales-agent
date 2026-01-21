@@ -10,10 +10,10 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from src.core.config_loader import get_tenant_config
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Context, ObjectWorkflowMapping, WorkflowStep
-from src.core.schemas import CreateMediaBuyRequest, MediaPackage
+from core.config_loader import get_tenant_config
+from core.database.database_session import get_db_session
+from core.database.models import Context, ObjectWorkflowMapping, WorkflowStep
+from core.schemas import CreateMediaBuyRequest, MediaPackage
 
 logger = logging.getLogger(__name__)
 
@@ -143,14 +143,14 @@ class GAMWorkflowManager:
         # Use naming template from adapter config, or fallback to default
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import AdapterConfig
-        from src.core.utils.naming import apply_naming_template, build_order_name_context
+        from core.database.database_session import get_db_session
+        from core.database.models import AdapterConfig
+        from core.utils.naming import apply_naming_template, build_order_name_context
 
         order_name_template = "{campaign_name|brand_name} - {date_range}"  # Default
         tenant_gemini_key = None
         with get_db_session() as db_session:
-            from src.core.database.models import Tenant
+            from core.database.models import Tenant
 
             stmt = select(AdapterConfig).filter_by(tenant_id=self.tenant_id)
             adapter_config = db_session.scalars(stmt).first()

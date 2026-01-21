@@ -21,11 +21,11 @@ from flask import (
 )
 from sqlalchemy import select, text
 
-from src.admin.utils import require_auth
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import Tenant
-from src.core.domain_config import (
+from admin.utils import require_auth
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import Tenant
+from core.domain_config import (
     extract_subdomain_from_host,
     is_sales_agent_domain,
 )
@@ -69,9 +69,9 @@ def render_super_admin_index():
     from sqlalchemy import func
     from sqlalchemy.orm import joinedload
 
-    from src.core.database.models import MediaBuy
-    from src.core.tenant_status import is_tenant_ad_server_configured
-    from src.services.setup_checklist_service import SetupChecklistService
+    from core.database.models import MediaBuy
+    from core.tenant_status import is_tenant_ad_server_configured
+    from services.setup_checklist_service import SetupChecklistService
 
     with get_db_session() as db_session:
         # Pagination
@@ -197,7 +197,7 @@ def render_super_admin_index():
 @core_bp.route("/")
 def index():
     """Main index page - shows landing page or redirects based on mode."""
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     # Check if this is actually an /admin/ request that had its prefix stripped by CustomProxyFix.
     # When request.script_root is "/admin", it means the request came via /admin/ path
@@ -211,7 +211,7 @@ def index():
         with get_db_session() as db_session:
             tenant = db_session.scalars(select(Tenant).filter_by(tenant_id="default")).first()
         if tenant:
-            from src.landing.landing_page import generate_tenant_landing_page
+            from landing.landing_page import generate_tenant_landing_page
 
             # Build effective host from request
             effective_host = request.headers.get("X-Forwarded-Host", request.host)
@@ -235,7 +235,7 @@ def index():
     # Multi-tenant mode below - behavior depends on authentication
     if "user" not in session:
         # Multi-tenant mode - use centralized routing logic
-        from src.core.domain_routing import route_landing_page
+        from core.domain_routing import route_landing_page
 
         result = route_landing_page(dict(request.headers))
 
@@ -252,7 +252,7 @@ def index():
         # Custom domain or subdomain with tenant - show agent landing page
         if result.type in ("custom_domain", "subdomain") and result.tenant:
             logger.info(f"[LANDING DEBUG] Tenant found ({result.type}), showing agent landing page")
-            from src.landing.landing_page import generate_tenant_landing_page
+            from landing.landing_page import generate_tenant_landing_page
 
             # The condition above ensures tenant is not None
             assert result.tenant is not None, "Tenant must be present for custom_domain/subdomain routing"
@@ -291,7 +291,7 @@ def index():
 @core_bp.route("/admin")
 def admin_index():
     """Admin UI entry point - requires authentication."""
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     logger.warning("========== ADMIN_INDEX HIT ==========")
     logger.warning(f"Session keys: {list(session.keys())}")
@@ -381,7 +381,7 @@ def health():
 def health_config():
     """Configuration health check endpoint."""
     try:
-        from src.core.startup import validate_startup_requirements
+        from core.startup import validate_startup_requirements
 
         validate_startup_requirements()
         return (
@@ -406,7 +406,7 @@ def health_config():
 @core_bp.route("/metrics")
 def metrics():
     """Prometheus metrics endpoint."""
-    from src.core.metrics import get_metrics_text
+    from core.metrics import get_metrics_text
 
     return get_metrics_text(), 200, {"Content-Type": "text/plain; charset=utf-8"}
 

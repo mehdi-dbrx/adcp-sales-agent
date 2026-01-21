@@ -14,17 +14,17 @@ from fastmcp.tools.tool import ToolResult
 from pydantic import ValidationError
 from rich.console import Console
 
-from src.core.tool_context import ToolContext
+from core.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 console = Console()
 
-from src.core.auth import get_principal_object
-from src.core.helpers.adapter_helpers import get_adapter
-from src.core.helpers.context_helpers import get_principal_id_from_context as _get_principal_id_from_context
-from src.core.schemas import PackagePerformance, UpdatePerformanceIndexRequest, UpdatePerformanceIndexResponse
-from src.core.tools.media_buy_update import _verify_principal
-from src.core.validation_helpers import format_validation_error
+from core.auth import get_principal_object
+from core.helpers.adapter_helpers import get_adapter
+from core.helpers.context_helpers import get_principal_id_from_context as _get_principal_id_from_context
+from core.schemas import PackagePerformance, UpdatePerformanceIndexRequest, UpdatePerformanceIndexResponse
+from core.tools.media_buy_update import _verify_principal
+from core.validation_helpers import format_validation_error
 
 
 def _update_performance_index_impl(
@@ -46,7 +46,7 @@ def _update_performance_index_impl(
     """
     # Create request object from individual parameters (MCP-compliant)
     # Convert dict performance_data to ProductPerformance objects
-    from src.core.schemas import ProductPerformance
+    from core.schemas import ProductPerformance
 
     try:
         performance_objects = [ProductPerformance(**perf) for perf in performance_data]

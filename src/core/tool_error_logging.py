@@ -43,7 +43,7 @@ def _extract_tenant_and_principal(context: Any) -> tuple[str | None, str | None]
     # Try to extract from FastMCP Context
     if isinstance(context, FastMCPContext):
         try:
-            from src.core.auth import get_principal_from_context
+            from core.auth import get_principal_from_context
 
             principal_id_result, tenant = get_principal_from_context(context, require_valid_token=False)
             if tenant:
@@ -109,7 +109,7 @@ def _log_tool_error(tool_name: str, error: Exception, tenant_id: str | None, pri
 
     # Log to activity feed for real-time visibility
     try:
-        from src.services.activity_feed import activity_feed
+        from services.activity_feed import activity_feed
 
         activity_feed.log_error(
             tenant_id=tenant_id,
@@ -122,7 +122,7 @@ def _log_tool_error(tool_name: str, error: Exception, tenant_id: str | None, pri
 
     # Log to audit log for persistent record
     try:
-        from src.core.audit_logger import get_audit_logger
+        from core.audit_logger import get_audit_logger
 
         audit_logger = get_audit_logger("MCP", tenant_id)
         audit_logger.log_operation(

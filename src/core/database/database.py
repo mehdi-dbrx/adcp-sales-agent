@@ -6,8 +6,8 @@ from datetime import datetime
 from sqlalchemy import func, select
 
 from scripts.ops.migrate import run_migrations
-from src.core.database.database_session import get_db_session
-from src.core.database.models import (
+from core.database.database_session import get_db_session
+from core.database.models import (
     AdapterConfig,
     AuthorizedProperty,
     CurrencyLimit,
@@ -25,11 +25,19 @@ def init_db(exit_on_error=False):
         exit_on_error: If True, exit process on migration error. If False, raise exception.
                       Default False for test compatibility.
     """
+    print("[DEBUG] init_db() called", flush=True)
     # Skip migrations if requested (for testing)
-    if os.environ.get("SKIP_MIGRATIONS") != "true":
+    skip_migrations_env = os.environ.get("SKIP_MIGRATIONS", "NOT_SET")
+    skip_migrations = skip_migrations_env.lower()
+    print(f"[DEBUG] SKIP_MIGRATIONS env var: '{skip_migrations_env}', normalized: '{skip_migrations}'", flush=True)
+    if skip_migrations != "true":
         # Run migrations first - this creates all tables
-        print("Applying database migrations...")
+        print("Applying database migrations...", flush=True)
         run_migrations(exit_on_error=exit_on_error)
+    else:
+        # If skipping migrations, also skip tenant initialization to avoid hanging on DB queries
+        print("Skipping migrations and tenant initialization (SKIP_MIGRATIONS=true)", flush=True)
+        return
 
     # Check if demo tenant should be created
     # CREATE_DEMO_TENANT=false (default) for production deployments
@@ -242,7 +250,7 @@ def init_db(exit_on_error=False):
 
             if existing_products_count == 0:
                 print("Creating sample products for testing...")
-                from src.core.database.models import PricingOption as PricingOptionModel
+                from core.database.models import PricingOption as PricingOptionModel
 
                 products_data = [
                     {

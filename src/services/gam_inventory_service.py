@@ -15,11 +15,11 @@ from typing import Any
 from sqlalchemy import String, and_, create_engine, delete, func, or_, select, text
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
-from src.adapters.gam_inventory_discovery import (
+from adapters.gam_inventory_discovery import (
     GAMInventoryDiscovery,
 )
-from src.core.database.db_config import DatabaseConfig
-from src.core.database.models import GAMInventory, Product, ProductInventoryMapping
+from core.database.db_config import DatabaseConfig
+from core.database.models import GAMInventory, Product, ProductInventoryMapping
 
 # Create database session factory
 engine = create_engine(DatabaseConfig.get_connection_string())
@@ -57,7 +57,7 @@ class GAMInventoryService:
         logger.info(f"Starting streaming inventory sync for tenant {tenant_id}")
 
         # Create discovery instance for streaming sync
-        from src.adapters.gam_inventory_discovery import GAMInventoryDiscovery
+        from adapters.gam_inventory_discovery import GAMInventoryDiscovery
 
         discovery = GAMInventoryDiscovery(gam_client, tenant_id)
 
@@ -685,7 +685,7 @@ class GAMInventoryService:
         """
         from sqlalchemy.exc import DBAPIError, OperationalError
 
-        from src.adapters.gam.utils.timeout_handler import TimeoutError, timeout
+        from adapters.gam.utils.timeout_handler import TimeoutError, timeout
 
         @timeout(seconds=120)  # 2 minute timeout for database operations
         def _commit_with_timeout():
@@ -1456,8 +1456,8 @@ def create_inventory_endpoints(app):
 
         try:
             # Get GAM client
-            from src.adapters.google_ad_manager import GoogleAdManager
-            from src.core.database.models import AdapterConfig, Tenant
+            from adapters.google_ad_manager import GoogleAdManager
+            from core.database.models import AdapterConfig, Tenant
 
             stmt = select(Tenant).filter_by(tenant_id=tenant_id)
             tenant = db_session.scalars(stmt).first()
@@ -1486,7 +1486,7 @@ def create_inventory_endpoints(app):
             }
 
             # Create dummy principal for client initialization
-            from src.core.schemas import Principal
+            from core.schemas import Principal
 
             principal = Principal(
                 principal_id="system",
@@ -1668,8 +1668,8 @@ def create_inventory_endpoints(app):
             key_display_name = key_item.inventory_metadata.get("display_name", key_item.name)
 
             # Get GAM client
-            from src.adapters.google_ad_manager import GoogleAdManager
-            from src.core.database.models import AdapterConfig, Tenant
+            from adapters.google_ad_manager import GoogleAdManager
+            from core.database.models import AdapterConfig, Tenant
 
             stmt = select(Tenant).filter_by(tenant_id=tenant_id)
             tenant = db_session.scalars(stmt).first()
@@ -1698,7 +1698,7 @@ def create_inventory_endpoints(app):
             }
 
             # Create dummy principal
-            from src.core.schemas import Principal
+            from core.schemas import Principal
 
             principal = Principal(
                 principal_id="system",
@@ -1718,7 +1718,7 @@ def create_inventory_endpoints(app):
             )
 
             # Fetch values using GAM API
-            from src.adapters.gam_inventory_discovery import GAMInventoryDiscovery
+            from adapters.gam_inventory_discovery import GAMInventoryDiscovery
 
             discovery = GAMInventoryDiscovery(adapter.client, tenant_id)
             values = discovery.discover_custom_targeting_values_for_key(key_id, max_values)

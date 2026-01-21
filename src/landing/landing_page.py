@@ -5,7 +5,7 @@ import os
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from src.core.domain_config import (
+from core.domain_config import (
     extract_subdomain_from_host,
     get_sales_agent_url,
     get_tenant_url,
@@ -212,7 +212,7 @@ def generate_tenant_landing_page(tenant: dict, virtual_host: str | None = None) 
         Exception: If template rendering fails
     """
     # Check if tenant is configured (has ad server connection)
-    from src.core.tenant_status import is_tenant_ad_server_configured
+    from core.tenant_status import is_tenant_ad_server_configured
 
     tenant_id = tenant.get("tenant_id")
     is_configured = is_tenant_ad_server_configured(tenant_id) if tenant_id else False
@@ -233,7 +233,7 @@ def generate_tenant_landing_page(tenant: dict, virtual_host: str | None = None) 
     agent_card_url = f"{base_url}/.well-known/agent.json"
 
     # Admin URL: Depends on deployment mode
-    from src.core.config_loader import is_single_tenant_mode
+    from core.config_loader import is_single_tenant_mode
 
     if is_single_tenant_mode():
         # Single-tenant mode: use full URLs based on virtual_host (passed from request)

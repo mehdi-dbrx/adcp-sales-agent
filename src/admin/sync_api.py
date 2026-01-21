@@ -17,10 +17,10 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, select
 
-from src.adapters.google_ad_manager import GoogleAdManager
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AdapterConfig, SyncJob, Tenant, TenantManagementConfig
-from src.services.gam_inventory_service import db_session as gam_db_session
+from adapters.google_ad_manager import GoogleAdManager
+from core.database.database_session import get_db_session
+from core.database.models import AdapterConfig, SyncJob, Tenant, TenantManagementConfig
+from services.gam_inventory_service import db_session as gam_db_session
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +145,7 @@ def trigger_sync(tenant_id: str) -> tuple[Response, int]:
         # Trigger sync using GAM adapter with sync manager
         try:
             # Initialize GAM adapter with sync manager
-            from src.core.schemas import Principal
+            from core.schemas import Principal
 
             # Create dummy principal for sync (no advertiser needed for inventory sync)
             principal = Principal(
@@ -522,8 +522,8 @@ def sync_tenant_orders(tenant_id: str) -> tuple[Response, int]:
             # Initialize GAM client
             from gam_orders_service import GAMOrdersService
 
-            from src.adapters.google_ad_manager import GoogleAdManager
-            from src.core.schemas import Principal
+            from adapters.google_ad_manager import GoogleAdManager
+            from core.schemas import Principal
 
             # Create dummy principal for sync (no advertiser needed for order discovery)
             principal = Principal(

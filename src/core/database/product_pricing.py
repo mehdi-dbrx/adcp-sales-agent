@@ -8,7 +8,7 @@ from typing import Any
 
 from sqlalchemy import inspect
 
-from src.core.database.models import Product as ProductModel
+from core.database.models import Product as ProductModel
 
 logger = logging.getLogger(__name__)
 

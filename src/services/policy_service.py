@@ -14,8 +14,8 @@ from babel import numbers as babel_numbers
 from sqlalchemy import select
 from sqlalchemy.orm import attributes
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import CurrencyLimit, Tenant
+from core.database.database_session import get_db_session
+from core.database.models import CurrencyLimit, Tenant
 
 
 class ValidationError(Exception):

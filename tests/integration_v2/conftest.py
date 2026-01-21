@@ -425,7 +425,7 @@ def add_required_setup_data(session, tenant_id: str):
         publisher_partner = PublisherPartner(
             tenant_id=tenant_id,
             publisher_domain="fixture-default.example.com",
-            display_name="Fixture Default Publisher",
+            display_name="Fixture TF1",
             is_verified=True,  # Must be verified for list_authorized_properties
             sync_status="success",
         )

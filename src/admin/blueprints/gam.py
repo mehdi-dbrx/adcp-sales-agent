@@ -9,13 +9,13 @@ from flask import Blueprint, jsonify, render_template, request, session
 from googleads import ad_manager, oauth2
 from sqlalchemy import select
 
-from src.adapters.gam.utils.constants import GAM_API_VERSION
-from src.adapters.gam_inventory_discovery import GAMInventoryDiscovery
-from src.adapters.gam_reporting_service import GAMReportingService
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import GAMLineItem, GAMOrder, Tenant
+from adapters.gam.utils.constants import GAM_API_VERSION
+from adapters.gam_inventory_discovery import GAMInventoryDiscovery
+from adapters.gam_reporting_service import GAMReportingService
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import GAMLineItem, GAMOrder, Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +140,7 @@ def detect_gam_network(tenant_id):
 
         # Get OAuth credentials from validated configuration
         try:
-            from src.core.config import get_gam_oauth_config
+            from core.config import get_gam_oauth_config
 
             gam_config = get_gam_oauth_config()
             client_id = gam_config.client_id
@@ -403,7 +403,7 @@ def configure_gam(tenant_id):
                 return jsonify({"success": False, "error": "Tenant not found"}), 404
 
             # Get or create adapter config
-            from src.core.database.models import AdapterConfig
+            from core.database.models import AdapterConfig
 
             adapter_config = db_session.scalars(select(AdapterConfig).filter_by(tenant_id=tenant_id)).first()
 
@@ -438,7 +438,7 @@ def configure_gam(tenant_id):
             if network_currency:
                 from decimal import Decimal
 
-                from src.core.database.models import CurrencyLimit
+                from core.database.models import CurrencyLimit
 
                 stmt = select(CurrencyLimit).filter_by(tenant_id=tenant_id, currency_code=network_currency)
                 existing_limit = db_session.scalars(stmt).first()
@@ -490,7 +490,7 @@ def view_gam_line_item(tenant_id, line_item_id):
                     return render_template("error.html", error="Tenant not found"), 404
 
                 # Get GAM configuration from adapter_config
-                from src.core.database.models import AdapterConfig
+                from core.database.models import AdapterConfig
 
                 adapter_config = db_session.scalars(select(AdapterConfig).filter_by(tenant_id=tenant_id)).first()
 
@@ -588,7 +588,7 @@ def get_gam_custom_targeting_keys(tenant_id):
                 return jsonify({"error": "Tenant not found"}), 404
 
             # Get GAM configuration from adapter_config
-            from src.core.database.models import AdapterConfig
+            from core.database.models import AdapterConfig
 
             adapter_config = db_session.scalars(select(AdapterConfig).filter_by(tenant_id=tenant_id)).first()
 
@@ -635,7 +635,7 @@ def get_sync_status(tenant_id, sync_id):
     """Get status of a sync job."""
     try:
         with get_db_session() as db_session:
-            from src.core.database.models import SyncJob
+            from core.database.models import SyncJob
 
             sync_job = db_session.scalars(select(SyncJob).filter_by(sync_id=sync_id, tenant_id=tenant_id)).first()
 
@@ -675,7 +675,7 @@ def get_latest_sync_status(tenant_id):
     """Get the latest running sync job for a tenant."""
     try:
         with get_db_session() as db_session:
-            from src.core.database.models import SyncJob
+            from core.database.models import SyncJob
 
             # Find the most recent running sync
             sync_job = db_session.scalars(
@@ -718,7 +718,7 @@ def reset_stuck_sync(tenant_id):
 
     try:
         with get_db_session() as db_session:
-            from src.core.database.models import SyncJob
+            from core.database.models import SyncJob
 
             # Find running inventory sync
             running_sync = db_session.scalars(
@@ -782,7 +782,7 @@ def create_service_account(tenant_id):
                 500,
             )
 
-        from src.services.gcp_service_account_service import GCPServiceAccountService
+        from services.gcp_service_account_service import GCPServiceAccountService
 
         service = GCPServiceAccountService(gcp_project_id=gcp_project_id)
 
@@ -823,7 +823,7 @@ def get_service_account_email(tenant_id):
         if not gcp_project_id:
             return jsonify({"error": "GCP_PROJECT_ID not configured"}), 500
 
-        from src.services.gcp_service_account_service import GCPServiceAccountService
+        from services.gcp_service_account_service import GCPServiceAccountService
 
         service = GCPServiceAccountService(gcp_project_id=gcp_project_id)
         email = service.get_service_account_email(tenant_id)
@@ -904,7 +904,7 @@ def test_gam_connection(tenant_id):
         elif auth_method == "service_account":
             # Service account flow
             with get_db_session() as db_session:
-                from src.core.database.models import AdapterConfig
+                from core.database.models import AdapterConfig
 
                 adapter_config = db_session.scalars(select(AdapterConfig).filter_by(tenant_id=tenant_id)).first()
 
@@ -1041,8 +1041,8 @@ def test_gam_connection(tenant_id):
                 client = ad_manager.AdManagerClient(oauth2_client, "AdCP-Sales-Agent-Setup", network_code=network_code)
 
                 # Use GoogleAdManager adapter to fetch advertisers (eliminates code duplication)
-                from src.adapters.google_ad_manager import GoogleAdManager
-                from src.core.schemas import Principal
+                from adapters.google_ad_manager import GoogleAdManager
+                from core.schemas import Principal
 
                 # Create mock principal for adapter initialization (not used for get_advertisers)
                 mock_principal = Principal(
@@ -1119,7 +1119,7 @@ def get_gam_line_item_api(tenant_id, line_item_id):
                     return jsonify({"error": "Tenant not found"}), 404
 
                 # Get GAM configuration from adapter_config
-                from src.core.database.models import AdapterConfig
+                from core.database.models import AdapterConfig
 
                 adapter_config = db_session.scalars(select(AdapterConfig).filter_by(tenant_id=tenant_id)).first()
 

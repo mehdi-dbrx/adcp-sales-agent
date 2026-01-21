@@ -11,8 +11,8 @@ creative agent-based format discovery per AdCP v2.4.
 import asyncio
 import json
 
-from src.core.database.database_session import get_db_session
-from src.core.schemas import Format
+from core.database.database_session import get_db_session
+from core.schemas import Format
 
 
 def get_format(
@@ -39,7 +39,7 @@ def get_format(
             return override
 
     # Get from creative agent registry
-    from src.core.creative_agent_registry import get_creative_agent_registry
+    from core.creative_agent_registry import get_creative_agent_registry
 
     registry = get_creative_agent_registry()
 
@@ -126,7 +126,7 @@ def _get_product_format_override(
             return None
 
         # Get base format from creative agent registry (WITHOUT product_id to avoid recursion)
-        from src.core.creative_agent_registry import get_creative_agent_registry
+        from core.creative_agent_registry import get_creative_agent_registry
 
         registry = get_creative_agent_registry()
 
@@ -195,7 +195,7 @@ def list_available_formats(
 
     logger = logging.getLogger(__name__)
 
-    from src.core.creative_agent_registry import get_creative_agent_registry
+    from core.creative_agent_registry import get_creative_agent_registry
 
     logger.info(f"[list_available_formats] Starting format fetch for tenant_id={tenant_id}")
 

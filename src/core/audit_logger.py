@@ -17,8 +17,8 @@ from typing import Any
 
 from sqlalchemy import select
 
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AuditLog
+from core.database.database_session import get_db_session
+from core.database.models import AuditLog
 
 # Create logs directory if it doesn't exist (for backup)
 LOG_DIR = Path("logs")
@@ -135,7 +135,7 @@ class AuditLogger:
             if tenant_id:
                 try:
                     with get_db_session() as db_session:
-                        from src.core.database.models import Tenant
+                        from core.database.models import Tenant
 
                         stmt = select(Tenant).filter_by(tenant_id=tenant_id)
                         tenant = db_session.scalars(stmt).first()
@@ -207,15 +207,15 @@ class AuditLogger:
                     should_notify = True
 
             if should_notify:
-                from src.core.utils.tenant_utils import serialize_tenant_to_dict
-                from src.services.slack_notifier import get_slack_notifier
+                from core.utils.tenant_utils import serialize_tenant_to_dict
+                from services.slack_notifier import get_slack_notifier
 
                 # Get tenant config for Slack notifier
                 tenant_config = None
                 if tenant_id:
                     try:
                         with get_db_session() as db_session:
-                            from src.core.database.models import Tenant
+                            from core.database.models import Tenant
 
                             stmt = select(Tenant).filter_by(tenant_id=tenant_id)
                             tenant = db_session.scalars(stmt).first()
@@ -278,8 +278,8 @@ class AuditLogger:
 
         # Send security alert to Slack
         try:
-            from src.core.utils.tenant_utils import serialize_tenant_to_dict
-            from src.services.slack_notifier import get_slack_notifier
+            from core.utils.tenant_utils import serialize_tenant_to_dict
+            from services.slack_notifier import get_slack_notifier
 
             # Get tenant name and config
             tenant_name = None
@@ -287,7 +287,7 @@ class AuditLogger:
             if tenant_id:
                 try:
                     with get_db_session() as db_session:
-                        from src.core.database.models import Tenant
+                        from core.database.models import Tenant
 
                         stmt = select(Tenant).filter_by(tenant_id=tenant_id)
                         tenant = db_session.scalars(stmt).first()

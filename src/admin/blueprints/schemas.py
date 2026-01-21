@@ -9,8 +9,8 @@ import logging
 
 from flask import Blueprint, jsonify
 
-from src.core.domain_config import get_sales_agent_url
-from src.core.schema_validation import create_schema_registry
+from core.domain_config import get_sales_agent_url
+from core.schema_validation import create_schema_registry
 
 logger = logging.getLogger(__name__)
 

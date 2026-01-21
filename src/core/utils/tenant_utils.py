@@ -9,8 +9,8 @@ MANDATORY: All tenant dict construction must use serialize_tenant_to_dict().
 
 from typing import Any
 
-from src.core.config_loader import safe_json_loads
-from src.core.database.models import Tenant
+from core.config_loader import safe_json_loads
+from core.database.models import Tenant
 
 
 def serialize_tenant_to_dict(tenant: Tenant) -> dict[str, Any]:

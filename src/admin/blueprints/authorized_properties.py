@@ -11,18 +11,18 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from sqlalchemy import select
 from werkzeug.wrappers import Response
 
-from src.admin.utils import require_tenant_access
-from src.admin.utils.audit_decorator import log_admin_action
-from src.core.database.database_session import get_db_session
-from src.core.database.models import AuthorizedProperty, PropertyTag, Tenant
-from src.core.domain_config import get_tenant_url
-from src.core.schemas import (
+from admin.utils import require_tenant_access
+from admin.utils.audit_decorator import log_admin_action
+from core.database.database_session import get_db_session
+from core.database.models import AuthorizedProperty, PropertyTag, Tenant
+from core.domain_config import get_tenant_url
+from core.schemas import (
     PROPERTY_ERROR_MESSAGES,
     PROPERTY_REQUIRED_FIELDS,
     PROPERTY_TYPES,
     SUPPORTED_UPLOAD_FILE_TYPES,
 )
-from src.services.property_verification_service import get_property_verification_service
+from services.property_verification_service import get_property_verification_service
 
 logger = logging.getLogger(__name__)
 
@@ -216,7 +216,7 @@ def _construct_agent_url(tenant_id: str, request: Any) -> str:
     """Construct the agent URL using existing tenant resolution logic."""
     import os
 
-    from src.core.database.models import Tenant
+    from core.database.models import Tenant
 
     logger.info(f"🏗️ Constructing agent URL for tenant: {tenant_id}")
 
@@ -597,9 +597,9 @@ def sync_properties_from_adagents(tenant_id: str) -> Response:
 
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import Tenant
-        from src.services.property_discovery_service import get_property_discovery_service
+        from core.database.database_session import get_db_session
+        from core.database.models import Tenant
+        from services.property_discovery_service import get_property_discovery_service
 
         logger.info(f"Starting property sync from adagents.json for tenant {tenant_id}")
 

@@ -23,8 +23,8 @@ from adcp.exceptions import ADCPAuthenticationError, ADCPConnectionError, ADCPEr
 from adcp.types import AssetContentType as AssetType
 from adcp.types import FormatCategory as FormatType
 
-from src.core.schemas import Format, FormatId
-from src.core.utils.mcp_client import create_mcp_client  # Keep for custom tools (preview, build)
+from core.schemas import Format, FormatId
+from core.utils.mcp_client import create_mcp_client  # Keep for custom tools (preview, build)
 
 
 @dataclass
@@ -131,8 +131,8 @@ class CreativeAgentRegistry:
         # Load tenant-specific agents from database
         from sqlalchemy import select
 
-        from src.core.database.database_session import get_db_session
-        from src.core.database.models import CreativeAgent as CreativeAgentModel
+        from core.database.database_session import get_db_session
+        from core.database.models import CreativeAgent as CreativeAgentModel
 
         with get_db_session() as session:
             stmt = select(CreativeAgentModel).filter_by(tenant_id=tenant_id, enabled=True)
